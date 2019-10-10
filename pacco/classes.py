@@ -1,59 +1,79 @@
+"""
+    This module shall contain the representation of object
+    ``PackageRegistry`` represent a package collection and client pair.
+    ``BinaryPackage`` represent a binary based on the setting in a ``PackageRegistry``.
+    ``BinaryPackage`` shall not know which ``PackageRegistry`` it is in. To make this happen, we change the working
+    directory of client to be inside the ``PackageRegistry``.
+
+    The dependency graph of the modules related composed of
+    ``PackageRegistry ---> Client``
+    ``BinaryRegistry ---> Client``
+    ``PackageRegistry ---> BinaryRegistry``
+"""
+
 import hashlib
 import json
 import logging
 from typing import Dict, List, Any, Optional
 
-from pacco.nexus_interfaces import Client
+from pacco.clients import Client
 
 ALLOWED_STRINGS_FILE_NAME = "allowed_settings.txt"
 
 
 class PackageRegistry:
     """
-        A PackageRegistry instance represent a package collection and client pair.
-        This class shall depend on ``Client`` but not the other way around.
-
-        An instantiation of this class represents the existence or the intend to make exist of the package collection
+        An instantiation of this class represents the existence of the package collection
         ``self.name`` in the client ``self.client``.
+
+        There is two way to instantiate the PackageRegistry, with or without ``allowed_settings``
+        If it is with ``allowed_settings``, it will take the ``allowed_settings`` as the setting, and will try to
+        set up a new package if it's not set up, or if the package already exist, will check if the settings is equal
+        else it will raise warning and use the existing ``allowed_settings`` version.
+
+        Thus, only use the ``allowed_settings`` options when creating new package registry.
+
     """
     def __init__(self, name: str, client: Client, allowed_settings: Optional[Dict[str, List[str]]] = None) -> None:
+        """
+            Attributes:
+                name: the name of the package
+                allowed_settings: the list of allowed values for all settings option
+            Args:
+                name: the name of the package
+                client: the client object as the cursor to remote repository
+                allowed_settings: the list of allowed values for all settings option
+        """
         self.name = name
-        self.client = client
+        self.__client = client
         self.allowed_settings = allowed_settings
         self.__allowed_settings_file_path = [self.name, ALLOWED_STRINGS_FILE_NAME]
         self.__dir_path = [self.name]
 
         if self.allowed_settings is None:
             self.allowed_settings = self.__get_allowed_settings_from_remote()
-
-    def declare_package(self):
-        if self.client.if_file_exists(self.__allowed_settings_file_path):
-            raise FileExistsError("the package is already declared")
+        elif self.__client.if_file_exists(self.__allowed_settings_file_path):
+            logging.warning("ALLOWED_SETTINGS already exist, will use the existing from remote")
         else:
-            allowed_settings = json.dumps(self.allowed_settings)
-            self.client.write_file(allowed_settings, self.__allowed_settings_file_path)
-            logging.info("Package {} declared".format(self.name))
+            self.__declare_package()
 
-    def delete_package(self, force: Optional[bool] = False):
-        if not self.client.if_file_exists(self.__allowed_settings_file_path):
+    def __del__(self) -> None:
+        """
+            Delete a package from the remote repository.
+        """
+        if not self.__client.if_file_exists(self.__allowed_settings_file_path):
             logging.warning("Intended to delete package {} but it is not declared".format(self.name))
-        elif self.client.lsr_dir(self.__dir_path) and not force:
-            raise FileExistsError("The package {} is not empty yet".format(self.name))
         else:
-            self.client.rm_dir(self.__dir_path)
+            self.__client.rm_dir(self.__dir_path)
 
-    def rename_settings(self, mapping: Dict[str, str]):
-        pass
-
-    def delete_settings(self, setting: str):
-        pass
-
-    def add_settings(self, setting: str, default_value: Optional[str] = ""):
-        pass
+    def __declare_package(self) -> None:
+        allowed_settings = json.dumps(self.allowed_settings)
+        self.__client.write_file(allowed_settings, self.__allowed_settings_file_path)
+        logging.info("Package {} declared".format(self.name))
 
     def __get_allowed_settings_from_remote(self) -> Dict[str, List[str]]:
-        if self.client.if_file_exists(self.__allowed_settings_file_path):
-            allowed_settings = json.loads(self.client.get_file_content(self.__allowed_settings_file_path))
+        if self.__client.if_file_exists(self.__allowed_settings_file_path):
+            allowed_settings = json.loads(self.__client.get_file_content(self.__allowed_settings_file_path))
             return PackageRegistry.__enforce_type_allowed_settings(allowed_settings)
         else:
             raise FileNotFoundError("allowed_settings is not defined and not found in remote")
@@ -71,9 +91,6 @@ class BinaryPackage:
 
         self.__settings_file_path = [self.settings_sha, self.settings_sha]
         self.__dir_path = [self.settings_sha]
-
-    def rename_settings(self, mapping: Dict[str, str]):
-        pass
 
     def delete_settings(self, setting: str):
         pass

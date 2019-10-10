@@ -32,6 +32,7 @@ author = 'Kevin Winata'
 extensions = [
     'sphinx.ext.autodoc',  # docstring support
     'sphinx.ext.napoleon',  # for google style docstring,
+    'sphinx_autodoc_typehints',
     'sphinx_rtd_theme',
 ]
 
