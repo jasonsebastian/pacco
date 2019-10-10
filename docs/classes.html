@@ -147,25 +147,92 @@
             
   <div class="section" id="module-pacco.classes">
 <span id="classes"></span><h1>Classes<a class="headerlink" href="#module-pacco.classes" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="pacco.classes.Client">
-<em class="property">class </em><code class="sig-prename descclassname">pacco.classes.</code><code class="sig-name descname">Client</code><a class="headerlink" href="#pacco.classes.Client" title="Permalink to this definition">¶</a></dt>
-<dd><p>The client shall act like git as in only index files and not directory.</p>
-<dl class="method">
-<dt id="pacco.classes.Client.rm_dir">
-<code class="sig-name descname">rm_dir</code><span class="sig-paren">(</span><em class="sig-param">dir_path: List[str]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pacco.classes.Client.rm_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p>rm_dir here means remove recursively all files within the directory</p>
-</dd></dl>
-
-</dd></dl>
-
+<p>This module shall contain the representation of object
+<code class="docutils literal notranslate"><span class="pre">PackageRegistry</span></code> represent a package collection and client pair.
+<code class="docutils literal notranslate"><span class="pre">BinaryPackage</span></code> represent a binary based on the setting in a <code class="docutils literal notranslate"><span class="pre">PackageRegistry</span></code>.
+<code class="docutils literal notranslate"><span class="pre">BinaryPackage</span></code> shall not know which <code class="docutils literal notranslate"><span class="pre">PackageRegistry</span></code> it is in. To make this happen, we change the working
+directory of client to be inside the <code class="docutils literal notranslate"><span class="pre">PackageRegistry</span></code>.</p>
+<p>The dependency graph of the modules related composed of
+<code class="docutils literal notranslate"><span class="pre">PackageRegistry</span> <span class="pre">---&gt;</span> <span class="pre">Client</span></code>
+<code class="docutils literal notranslate"><span class="pre">BinaryRegistry</span> <span class="pre">---&gt;</span> <span class="pre">Client</span></code>
+<code class="docutils literal notranslate"><span class="pre">PackageRegistry</span> <span class="pre">---&gt;</span> <span class="pre">BinaryRegistry</span></code></p>
 <dl class="class">
 <dt id="pacco.classes.PackageRegistry">
-<em class="property">class </em><code class="sig-prename descclassname">pacco.classes.</code><code class="sig-name descname">PackageRegistry</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">client: pacco.classes.Client</em>, <em class="sig-param">allowed_settings: Optional[Dict[str</em>, <em class="sig-param">List[str]]] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry" title="Permalink to this definition">¶</a></dt>
-<dd><p>A PackageRegistry instance represent a package collection and client pair.
-This class shall depend on <code class="docutils literal notranslate"><span class="pre">Client</span></code> but not the other way around.</p>
-<p>An instantiation of this class represents the existence or the intend to make exist of the package collection
+<em class="property">class </em><code class="sig-prename descclassname">pacco.classes.</code><code class="sig-name descname">PackageRegistry</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">client</em>, <em class="sig-param">allowed_settings=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry" title="Permalink to this definition">¶</a></dt>
+<dd><p>An instantiation of this class represents the existence of the package collection
 <code class="docutils literal notranslate"><span class="pre">self.name</span></code> in the client <code class="docutils literal notranslate"><span class="pre">self.client</span></code>.</p>
+<p>There is two way to instantiate the PackageRegistry, with or without <code class="docutils literal notranslate"><span class="pre">allowed_settings</span></code>
+If it is with <code class="docutils literal notranslate"><span class="pre">allowed_settings</span></code>, it will take the <code class="docutils literal notranslate"><span class="pre">allowed_settings</span></code> as the setting, and will try to
+set up a new package if it’s not set up, or if the package already exist, will check if the settings is equal
+else it will raise warning and use the existing <code class="docutils literal notranslate"><span class="pre">allowed_settings</span></code> version.</p>
+<p>Thus, only use the <code class="docutils literal notranslate"><span class="pre">allowed_settings</span></code> options when creating new package registry.</p>
+<dl class="attribute">
+<dt id="pacco.classes.PackageRegistry.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#pacco.classes.PackageRegistry.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>the name of the package</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pacco.classes.PackageRegistry.allowed_settings">
+<code class="sig-name descname">allowed_settings</code><a class="headerlink" href="#pacco.classes.PackageRegistry.allowed_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>the list of allowed values for all settings option</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the name of the package</p></li>
+<li><p><strong>client</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Client</span></code>) – the client object as the cursor to remote repository</p></li>
+<li><p><strong>allowed_settings</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]) – the list of allowed values for all settings option</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pacco.classes.PackageRegistry.__del__">
+<code class="sig-name descname">__del__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry.__del__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a package from the remote repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes.PackageRegistry.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">client</em>, <em class="sig-param">allowed_settings=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt>
+<code class="sig-name descname">name</code></dt>
+<dd><p>the name of the package</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="sig-name descname">allowed_settings</code></dt>
+<dd><p>the list of allowed values for all settings option</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the name of the package</p></li>
+<li><p><strong>client</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Client</span></code>) – the client object as the cursor to remote repository</p></li>
+<li><p><strong>allowed_settings</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]) – the list of allowed values for all settings option</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pacco.classes.PackageRegistry.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#pacco.classes.PackageRegistry.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
