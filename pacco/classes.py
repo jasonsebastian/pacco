@@ -1,21 +1,30 @@
 import json
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 
 ALLOWED_STRINGS_FILE_NAME = "allowed_settings.txt"
 
 
 class Client:
-    def if_file_exists(self, path: List[str]) -> bool:
+    """
+    The client shall act like git as in only index files and not directory.
+    """
+    def if_file_exists(self, file_path: List[str]) -> bool:
         return True
 
-    def get_file_content(self, path: List[str]) -> str:
+    def get_file_content(self, file_path: List[str]) -> str:
         return 'hello world!'
 
-    def mkdir(self, path: List[str]) -> None:
+    def write_file(self, content: str, file_path: List[str]) -> None:
         return
 
-    def write_file(self, content: str, path: List[str]) -> None:
+    def lsr_dir(self, dir_path: List[str]) -> List[Tuple[bool, str]]:
+        return []
+
+    def rm_dir(self, dir_path: List[str]) -> None:
+        """
+        rm_dir here means remove recursively all files within the directory
+        """
         return
 
 
@@ -32,6 +41,7 @@ class PackageRegistry(object):
         self.client = client
         self.allowed_settings = allowed_settings
         self.__allowed_string_file_path = [self.name, ALLOWED_STRINGS_FILE_NAME]
+        self.__dir_path = [self.name]
 
         if self.allowed_settings is None:
             self.allowed_settings = self.__get_allowed_settings_from_remote()
@@ -40,10 +50,17 @@ class PackageRegistry(object):
         if self.client.if_file_exists(self.__allowed_string_file_path):
             raise FileExistsError("the package is already declared")
         else:
-            self.client.mkdir([self.name])
             allowed_settings = json.dumps(self.allowed_settings)
             self.client.write_file(allowed_settings, self.__allowed_string_file_path)
             logging.info("Package {} declared".format(self.name))
+
+    def delete_package(self, force: Optional[bool] = False):
+        if not self.client.if_file_exists(self.__allowed_string_file_path):
+            logging.warning("Intended to delete package {} but it is not declared".format(self.name))
+        elif self.client.lsr_dir(self.__dir_path) and not force:
+            raise FileExistsError("The package {} is not empty yet".format(self.name))
+        else:
+            self.client.rm_dir(self.__dir_path)
 
     def __get_allowed_settings_from_remote(self) -> Dict[str, List[str]]:
         if self.client.if_file_exists(self.__allowed_string_file_path):
@@ -55,5 +72,3 @@ class PackageRegistry(object):
     @staticmethod
     def __enforce_type_allowed_settings(__settings: Any) -> Dict[str, List[str]]:
         return {str(key): [str(value) for value in values] for key, values in __settings.items()}
-
-
