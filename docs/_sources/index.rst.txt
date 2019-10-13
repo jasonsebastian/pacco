@@ -7,4 +7,4 @@ Pacco Documentation
 
    classes
 
-
+.. image:: diagrams/pacco.png
