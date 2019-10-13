@@ -1,27 +1,45 @@
-from typing import List, Tuple
+from __future__ import annotations
+
+import os
+import shutil
+from typing import List, Tuple, Type
 
 
-class Client:
-    """
-    The client shall act like git as in only index files and not directory.
-    """
-    def if_file_exists(self, file_path: List[str]) -> bool:
-        return True
+class ClientAbstract:
+    def ls(self) -> List[str]:
+        raise NotImplementedError()
 
-    def get_file_content(self, file_path: List[str]) -> str:
-        return 'hello world!'
+    def rmdir(self, name: str) -> List[str]:
+        raise NotImplementedError()
 
-    def write_file(self, content: str, file_path: List[str]) -> None:
-        return
+    def dispatch_subdir(self, name: str) -> Type[ClientAbstract]:
+        raise NotImplementedError()
 
-    def lsr_dir(self, dir_path: List[str]) -> List[Tuple[bool, str]]:
-        return []
+    def download_dir(self, download_path: str) -> None:
+        raise NotImplementedError()
 
-    def rm_dir(self, dir_path: List[str]) -> None:
-        """
-        rm_dir here means remove recursively all files within the directory
-        """
-        return
+    def upload_dir(self, dir_path: str) -> None:
+        raise NotImplementedError()
 
-    def change_directory(self, dir_path: List[str]) -> None:
-        return
+
+class LocalClient(ClientAbstract):
+    def __init__(self, dir_name: str) -> None:
+        self.__dir_name = dir_name
+        self.__root_dir = os.getcwd()
+        os.chdir(os.path.join(self.__root_dir, self.__dir_name))
+
+    def ls(self) -> List[str]:
+        return os.listdir(os.getcwd())
+
+    def rmdir(self, name: str) -> List[str]:
+        shutil.rmdir(os.path.join(self.__root_dir, name))
+
+    def dispatch_subdir(self, name: str) -> Type[ClientAbstract]:
+        os.chdir(os.path.join(self.__root_dir, self.))
+
+
+    def download_dir(self, download_path: str) -> None:
+        raise NotImplementedError()
+
+    def upload_dir(self, dir_path: str) -> None:
+        raise NotImplementedError()
