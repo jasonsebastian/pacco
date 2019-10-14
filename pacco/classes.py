@@ -80,3 +80,9 @@ class PackageRegistry:
 class PackageBinary:
     def __init__(self, client: FileBasedClientAbstract):
         self.client = client
+
+    def download_content(self, download_path: str) -> None:
+        self.client.download_dir(download_path)
+
+    def upload_content(self, dir_path: str) -> None:
+        self.client.upload_dir(dir_path)
