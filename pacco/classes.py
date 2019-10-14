@@ -7,11 +7,30 @@ from pacco.clients import FileBasedClientAbstract
 
 class PackageManager:
     def __init__(self, client: FileBasedClientAbstract):
+        """
+        >>> from pacco.clients import LocalClient
+        >>> LocalClient().rmdir('')  # clean the .pacco directory
+        >>> client = LocalClient()
+        >>> pm = PackageManager(client)
+        >>> pm.list_package_registries()
+        {}
+        >>> pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
+        PR[openssl, compiler, os, version]
+        >>> pm.add_package_registry('boost', ['os', 'target', 'type'])
+        PR[boost, os, target, type]
+        >>> sorted(pm.list_package_registries().keys())
+        ['boost', 'openssl']
+        >>> pm.list_package_registries()['boost']
+        PR[boost, os, target, type]
+        >>> pm.delete_package_registry('openssl')
+        >>> pm.list_package_registries()
+        {'boost': PR[boost, os, target, type]}
+        """
         self.client = client
 
     def list_package_registries(self) -> Dict[str, PackageRegistry]:
         dir_names = self.client.ls()
-        return {dir_name: PackageRegistry(self.client.dispatch_subdir(dir_name)) for dir_name in dir_names}
+        return {dir_name: PackageRegistry(dir_name, self.client.dispatch_subdir(dir_name)) for dir_name in dir_names}
 
     def delete_package_registry(self, name: str):
         self.client.rmdir(name)
@@ -21,11 +40,12 @@ class PackageManager:
         if name in dirs:
             raise FileExistsError("The package registry {} is already found".format(name))
         self.client.mkdir(name)
-        return PackageRegistry(self.client.dispatch_subdir(name), settings_key)
+        return PackageRegistry(name, self.client.dispatch_subdir(name), settings_key)
 
 
 class PackageRegistry:
-    def __init__(self, client: FileBasedClientAbstract, settings_key: Optional[List[str]] = None):
+    def __init__(self, name: str, client: FileBasedClientAbstract, settings_key: Optional[List[str]] = None):
+        self.name = name
         self.client = client
         from_remote = self.__get_settings_key()
         if settings_key is None and from_remote is None:
@@ -35,6 +55,9 @@ class PackageRegistry:
         else:
             self.settings_key = settings_key
             self.client.mkdir(self.__generate_settings_key_dir_name(self.settings_key))
+
+    def __repr__(self):
+        return "PR[{}, {}]".format(self.name, ', '.join(sorted(self.settings_key)))
 
     def __get_settings_key(self) -> Optional[List[str]]:
         settings_key = None

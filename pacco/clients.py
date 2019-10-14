@@ -80,6 +80,7 @@ class LocalClient(FileBasedClientAbstract):
             self.__root_dir = path
         else:
             self.__root_dir = os.path.join(str(Path.home()), '.pacco')
+            os.makedirs(self.__root_dir, exist_ok=True)
 
     def ls(self) -> List[str]:
         return os.listdir(self.__root_dir)
