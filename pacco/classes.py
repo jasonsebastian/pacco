@@ -13,7 +13,7 @@ class PackageManager:
         >>> client = LocalClient()
         >>> pm = PackageManager(client)
         >>> pm.list_package_registries()
-        {}
+        []
         >>> pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
         PR[openssl, compiler, os, version]
         >>> pm.add_package_registry('boost', ['os', 'target', 'type'])
@@ -22,19 +22,18 @@ class PackageManager:
         Traceback (most recent call last):
             ...
         FileExistsError: The package registry openssl is already found
-        >>> sorted(pm.list_package_registries().keys())
-        ['boost', 'openssl']
-        >>> pm.list_package_registries()['boost']
-        PR[boost, os, target, type]
+        >>> pm.list_package_registries()
+        [('boost', PR[boost, os, target, type]), ('openssl', PR[openssl, compiler, os, version])]
         >>> pm.delete_package_registry('openssl')
         >>> pm.list_package_registries()
-        {'boost': PR[boost, os, target, type]}
+        [('boost', PR[boost, os, target, type])]
         """
         self.client = client
 
-    def list_package_registries(self) -> Dict[str, PackageRegistry]:
+    def list_package_registries(self) -> List[Tuple[str, PackageRegistry]]:
         dir_names = self.client.ls()
-        return {dir_name: PackageRegistry(dir_name, self.client.dispatch_subdir(dir_name)) for dir_name in dir_names}
+        return sorted([(dir_name, PackageRegistry(dir_name, self.client.dispatch_subdir(dir_name)))
+                       for dir_name in dir_names], key=lambda x: x[0])
 
     def delete_package_registry(self, name: str):
         self.client.rmdir(name)
