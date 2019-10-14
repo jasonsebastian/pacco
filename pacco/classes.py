@@ -58,19 +58,8 @@ class PackageRegistry:
         >>> from pacco.clients import LocalClient
         >>> LocalClient().rmdir('')  # clean the .pacco directory
         >>> client = LocalClient()
-        >>> pr = PackageRegistry('openssl', client)
-        Traceback (most recent call last):
-            ...
-        FileNotFoundError: declare settings_key
-        >>> pr = PackageRegistry('openssl', client, ['os', 'compiler', 'version'])
-        >>> pr
-        PR[openssl, compiler, os, version]
-        >>> del pr
-        >>> PackageRegistry('openssl', client)  # will get settings_key from remote if exist
-        PR[openssl, compiler, os, version]
-        >>> PackageRegistry('openssl', client, ['new', 'weird', 'settings'])  # ignore given if found in remote
-        PR[openssl, compiler, os, version]
-        >>> pr = PackageRegistry('openssl', client)
+        >>> pm = PackageManager(client)
+        >>> pr = pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
         >>> pr.list_package_binaries()
         []
         >>> pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
