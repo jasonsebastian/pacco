@@ -6,8 +6,10 @@ from pacco.clients import FileBasedClientAbstract
 
 
 class PackageManager:
-    def __init__(self, client: FileBasedClientAbstract):
-        """
+    """
+    Represent the existence of the manager in a remote
+
+    Examples:
         >>> from pacco.clients import LocalClient
         >>> LocalClient().rmdir('')  # clean the .pacco directory
         >>> client = LocalClient()
@@ -27,7 +29,9 @@ class PackageManager:
         >>> pm.delete_package_registry('openssl')
         >>> pm.list_package_registries()
         [('boost', PR[boost, os, target, type])]
-        """
+    """
+    def __init__(self, client: FileBasedClientAbstract):
+
         self.client = client
 
     def list_package_registries(self) -> List[Tuple[str, PackageRegistry]]:
@@ -47,8 +51,10 @@ class PackageManager:
 
 
 class PackageRegistry:
-    def __init__(self, name: str, client: FileBasedClientAbstract, settings_key: Optional[List[str]] = None):
-        """
+    """
+    Represent the existence of a package (e.g. openssl) in the package manager
+    
+    Examples:
         >>> from pacco.clients import LocalClient
         >>> LocalClient().rmdir('')  # clean the .pacco directory
         >>> client = LocalClient()
@@ -87,7 +93,8 @@ class PackageRegistry:
         >>> pr.delete_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
         >>> pr.list_package_binaries()
         [('compiler=gcc==os=linux==version=1.0', PackageBinaryObject)]
-        """
+    """
+    def __init__(self, name: str, client: FileBasedClientAbstract, settings_key: Optional[List[str]] = None):
         self.name = name
         self.client = client
         from_remote = self.__get_settings_key()
