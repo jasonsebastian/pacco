@@ -153,12 +153,6 @@
 <em class="property">class </em><code class="sig-prename descclassname">pacco.clients.</code><code class="sig-name descname">FileBasedClientAbstract</code><a class="headerlink" href="#pacco.clients.FileBasedClientAbstract" title="Permalink to this definition">¶</a></dt>
 <dd><p>An interface for file-based client functionality.
 Each client shall have it’s own context of current directory and it must not change throughout the lifetime.</p>
-<dl class="attribute">
-<dt id="pacco.clients.FileBasedClientAbstract.__weakref__">
-<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#pacco.clients.FileBasedClientAbstract.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="pacco.clients.FileBasedClientAbstract.dispatch_subdir">
 <code class="sig-name descname">dispatch_subdir</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.clients.FileBasedClientAbstract.dispatch_subdir" title="Permalink to this definition">¶</a></dt>
@@ -255,17 +249,6 @@ file.</p>
 <dt id="pacco.clients.LocalClient">
 <em class="property">class </em><code class="sig-prename descclassname">pacco.clients.</code><code class="sig-name descname">LocalClient</code><span class="sig-paren">(</span><em class="sig-param">path=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.clients.LocalClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>An implementation of <code class="docutils literal notranslate"><span class="pre">FileBasedClientAbstract</span></code>, using <code class="docutils literal notranslate"><span class="pre">homepath/.pacco</span></code> as the file storage.</p>
-<dl class="method">
-<dt id="pacco.clients.LocalClient.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">path=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.clients.LocalClient.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="method">
 <dt id="pacco.clients.LocalClient.dispatch_subdir">
 <code class="sig-name descname">dispatch_subdir</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.clients.LocalClient.dispatch_subdir" title="Permalink to this definition">¶</a></dt>

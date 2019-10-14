@@ -175,18 +175,6 @@
 <span class="go">[(&#39;boost&#39;, PR[boost, os, target, type])]</span>
 </pre></div>
 </div>
-<dl class="method">
-<dt id="pacco.classes.PackageManager.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">client</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageManager.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pacco.classes.PackageManager.__weakref__">
-<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#pacco.classes.PackageManager.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -197,19 +185,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pacco.clients</span> <span class="k">import</span> <span class="n">LocalClient</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">LocalClient</span><span class="p">()</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>  <span class="c1"># clean the .pacco directory</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">LocalClient</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span> <span class="o">=</span> <span class="n">PackageRegistry</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">,</span> <span class="n">client</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-    <span class="o">...</span>
-<span class="gr">FileNotFoundError</span>: <span class="n">declare settings_key</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span> <span class="o">=</span> <span class="n">PackageRegistry</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;os&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span>
-<span class="go">PR[openssl, compiler, os, version]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">pr</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">PackageRegistry</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">,</span> <span class="n">client</span><span class="p">)</span>  <span class="c1"># will get settings_key from remote if exist</span>
-<span class="go">PR[openssl, compiler, os, version]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">PackageRegistry</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">,</span> <span class="s1">&#39;weird&#39;</span><span class="p">,</span> <span class="s1">&#39;settings&#39;</span><span class="p">])</span>  <span class="c1"># ignore given if found in remote</span>
-<span class="go">PR[openssl, compiler, os, version]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span> <span class="o">=</span> <span class="n">PackageRegistry</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">,</span> <span class="n">client</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pm</span> <span class="o">=</span> <span class="n">PackageManager</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">add_package_registry</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;os&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span><span class="o">.</span><span class="n">list_package_binaries</span><span class="p">()</span>
 <span class="go">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span><span class="o">.</span><span class="n">add_package_binary</span><span class="p">({</span><span class="s1">&#39;os&#39;</span><span class="p">:</span><span class="s1">&#39;osx&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">:</span><span class="s1">&#39;clang&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">:</span><span class="s1">&#39;1.0&#39;</span><span class="p">})</span>
@@ -233,24 +210,6 @@
 <span class="go">[(&#39;compiler=gcc==os=linux==version=1.0&#39;, PackageBinaryObject)]</span>
 </pre></div>
 </div>
-<dl class="method">
-<dt id="pacco.classes.PackageRegistry.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">client</em>, <em class="sig-param">settings_key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pacco.classes.PackageRegistry.__repr__">
-<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry.__repr__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return repr(self).</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pacco.classes.PackageRegistry.__weakref__">
-<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#pacco.classes.PackageRegistry.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
