@@ -6,7 +6,11 @@ from pathlib import Path
 from typing import List, Optional
 
 
-class FileBasedClientAbstract:
+class ClientAbstract:
+    pass
+
+
+class FileBasedClientAbstract(ClientAbstract):
     """
     An interface for file-based client functionality.
     Each client shall have it's own context of current directory and it must not change throughout the lifetime.
