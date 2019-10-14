@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import os
 import shutil
-from typing import List, Tuple, Type
+from pathlib import Path
+from typing import List, Tuple, Type, Optional
 
 
 class ClientAbstract:
     def ls(self) -> List[str]:
         raise NotImplementedError()
 
-    def rmdir(self, name: str) -> List[str]:
+    def rmdir(self, name: str) -> None:
         raise NotImplementedError()
 
     def dispatch_subdir(self, name: str) -> Type[ClientAbstract]:
@@ -23,23 +24,23 @@ class ClientAbstract:
 
 
 class LocalClient(ClientAbstract):
-    def __init__(self, dir_name: str) -> None:
-        self.__dir_name = dir_name
-        self.__root_dir = os.getcwd()
-        os.chdir(os.path.join(self.__root_dir, self.__dir_name))
+    def __init__(self, path: Optional[str] = "") -> None:
+        if path:
+            self.__root_dir = path
+        else:
+            self.__root_dir = os.path.join(str(Path.home()), '.pacco')
 
     def ls(self) -> List[str]:
-        return os.listdir(os.getcwd())
+        return os.listdir(self.__root_dir)
 
-    def rmdir(self, name: str) -> List[str]:
-        shutil.rmdir(os.path.join(self.__root_dir, name))
+    def rmdir(self, name: str) -> None:
+        shutil.rmtree(os.path.join(self.__root_dir, name))
 
-    def dispatch_subdir(self, name: str) -> Type[ClientAbstract]:
-        os.chdir(os.path.join(self.__root_dir, self.))
-
+    def dispatch_subdir(self, name: str) -> LocalClient:
+        return LocalClient(os.path.join(self.__root_dir, name))
 
     def download_dir(self, download_path: str) -> None:
-        raise NotImplementedError()
+        shutil.copy(self.__root_dir, download_path)
 
     def upload_dir(self, dir_path: str) -> None:
-        raise NotImplementedError()
+        shutil.copy(dir_path, self.__root_dir)
