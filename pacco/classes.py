@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from pacco.clients import FileBasedClientAbstract
 
@@ -18,6 +18,10 @@ class PackageManager:
         PR[openssl, compiler, os, version]
         >>> pm.add_package_registry('boost', ['os', 'target', 'type'])
         PR[boost, os, target, type]
+        >>> pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
+        Traceback (most recent call last):
+            ...
+        FileExistsError: The package registry openssl is already found
         >>> sorted(pm.list_package_registries().keys())
         ['boost', 'openssl']
         >>> pm.list_package_registries()['boost']
@@ -45,6 +49,46 @@ class PackageManager:
 
 class PackageRegistry:
     def __init__(self, name: str, client: FileBasedClientAbstract, settings_key: Optional[List[str]] = None):
+        """
+        >>> from pacco.clients import LocalClient
+        >>> LocalClient().rmdir('')  # clean the .pacco directory
+        >>> client = LocalClient()
+        >>> pr = PackageRegistry('openssl', client)
+        Traceback (most recent call last):
+            ...
+        FileNotFoundError: declare settings_key
+        >>> pr = PackageRegistry('openssl', client, ['os', 'compiler', 'version'])
+        >>> pr
+        PR[openssl, compiler, os, version]
+        >>> del pr
+        >>> PackageRegistry('openssl', client)  # will get settings_key from remote if exist
+        PR[openssl, compiler, os, version]
+        >>> PackageRegistry('openssl', client, ['new', 'weird', 'settings'])  # ignore given if found in remote
+        PR[openssl, compiler, os, version]
+        >>> pr = PackageRegistry('openssl', client)
+        >>> pr.list_package_binaries()
+        []
+        >>> pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
+        ('compiler=clang==os=osx==version=1.0', PackageBinaryObject)
+        >>> pr.add_package_binary({'host_os':'osx', 'compiler':'clang', 'version':'1.0'})
+        Traceback (most recent call last):
+            ...
+        KeyError: "wrong settings key: ['compiler', 'host_os', 'version'] is not ['compiler', 'os', 'version']"
+        >>> pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
+        Traceback (most recent call last):
+            ...
+        FileExistsError: such binary already exist
+        >>> pr.list_package_binaries()
+        [('compiler=clang==os=osx==version=1.0', PackageBinaryObject)]
+        >>> pr.add_package_binary({'os':'linux', 'compiler':'gcc', 'version':'1.0'})
+        ('compiler=gcc==os=linux==version=1.0', PackageBinaryObject)
+        >>> pr.list_package_binaries()
+        [('compiler=clang==os=osx==version=1.0', PackageBinaryObject), \
+('compiler=gcc==os=linux==version=1.0', PackageBinaryObject)]
+        >>> pr.delete_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
+        >>> pr.list_package_binaries()
+        [('compiler=gcc==os=linux==version=1.0', PackageBinaryObject)]
+        """
         self.name = name
         self.client = client
         from_remote = self.__get_settings_key()
@@ -78,22 +122,20 @@ class PackageRegistry:
         zipped_assignments = ['='.join(pair) for pair in sorted_settings_value_pair]
         return '=='.join(zipped_assignments)
 
-    @staticmethod
-    def __parse_settings_value(dir_name: str) -> Dict[str, str]:
-        assignments = dir_name.split('==')
-        unzipped_assignments = [(setting.split('=')[0], setting.split('=')[1]) for setting in assignments]
-        return {key: value for key, value in unzipped_assignments}
-
-    def list_package_binaries(self) -> Dict[Dict[str, str], PackageBinary]:
+    def list_package_binaries(self) -> List[Tuple[str, PackageBinary]]:
         dirs = self.client.ls()
         dirs.remove(self.__generate_settings_key_dir_name(self.settings_key))
-        return {PackageRegistry.__parse_settings_value(name): PackageBinary(self.client.dispatch_subdir(name))
-                for name in dirs}
+        return sorted([(name, PackageBinary(self.client.dispatch_subdir(name))) for name in dirs], key=lambda x: x[0])
 
-    def add_package_binary(self, settings_value: Dict[str, str]) -> PackageBinary:
+    def add_package_binary(self, settings_value: Dict[str, str]) -> Tuple[str, PackageBinary]:
+        if set(settings_value.keys()) != set(self.settings_key):
+            raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
+                                                                               sorted(self.settings_key)))
         dir_name = PackageRegistry.__generate_dir_name_from_settings_value(settings_value)
+        if dir_name in self.client.ls():
+            raise FileExistsError("such binary already exist")
         self.client.mkdir(dir_name)
-        return PackageBinary(self.client.dispatch_subdir(dir_name))
+        return dir_name, PackageBinary(self.client.dispatch_subdir(dir_name))
 
     def delete_package_binary(self, settings_value: Dict[str, str]):
         dir_name = PackageRegistry.__generate_dir_name_from_settings_value(settings_value)
@@ -103,6 +145,9 @@ class PackageRegistry:
 class PackageBinary:
     def __init__(self, client: FileBasedClientAbstract):
         self.client = client
+
+    def __repr__(self):
+        return "PackageBinaryObject"
 
     def download_content(self, download_path: str) -> None:
         self.client.download_dir(download_path)
