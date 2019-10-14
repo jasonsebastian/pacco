@@ -81,7 +81,12 @@
             
             
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Classes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#packagemanager">PackageManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#packageregistry">PackageRegistry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#packagebinary">PackageBinary</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="clients.html">Clients</a></li>
 </ul>
 
@@ -147,8 +152,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-pacco.classes">
-<span id="classes"></span><h1>Classes<a class="headerlink" href="#module-pacco.classes" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="classes">
+<h1>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="packagemanager">
+<h2>PackageManager<a class="headerlink" href="#packagemanager" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pacco.classes.PackageManager">
 <em class="property">class </em><code class="sig-prename descclassname">pacco.classes.</code><code class="sig-name descname">PackageManager</code><span class="sig-paren">(</span><em class="sig-param">client</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageManager" title="Permalink to this definition">¶</a></dt>
@@ -229,6 +236,9 @@
 
 </dd></dl>
 
+</div>
+<div class="section" id="packageregistry">
+<h2>PackageRegistry<a class="headerlink" href="#packageregistry" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pacco.classes.PackageRegistry">
 <em class="property">class </em><code class="sig-prename descclassname">pacco.classes.</code><code class="sig-name descname">PackageRegistry</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">client</em>, <em class="sig-param">settings_key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry" title="Permalink to this definition">¶</a></dt>
@@ -272,7 +282,7 @@ by creating a new directory, to upload the binary must be done through the <code
 <dd class="field-odd"><p><strong>settings_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the assignment of key value of the settings_key.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinary</span></code>]</p>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes.PackageBinary" title="pacco.classes.PackageBinary"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinary</span></code></a>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The tuple of the name of the directory name (serialized version of the configuration) and the object</p>
@@ -302,7 +312,7 @@ FileExistsError: raised if a package binary with the same configuration already 
 <dd><p>List the package binaries registered in this package registry</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinary</span></code>]]</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes.PackageBinary" title="pacco.classes.PackageBinary"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinary</span></code></a>]]</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>list of tuples of the package binary name and object</p>
@@ -312,6 +322,66 @@ FileExistsError: raised if a package binary with the same configuration already 
 
 </dd></dl>
 
+</div>
+<div class="section" id="packagebinary">
+<h2>PackageBinary<a class="headerlink" href="#packagebinary" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pacco.classes.PackageBinary">
+<em class="property">class </em><code class="sig-prename descclassname">pacco.classes.</code><code class="sig-name descname">PackageBinary</code><span class="sig-paren">(</span><em class="sig-param">client</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageBinary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent the existence of a package (e.g. openssl) in the package manager</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pacco.clients</span> <span class="k">import</span> <span class="n">LocalClient</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LocalClient</span><span class="p">()</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>  <span class="c1"># clean the .pacco directory</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">LocalClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pm</span> <span class="o">=</span> <span class="n">PackageManager</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">add_package_registry</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;os&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">,</span> <span class="n">pb</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">add_package_binary</span><span class="p">({</span><span class="s1">&#39;os&#39;</span><span class="p">:</span><span class="s1">&#39;osx&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">:</span><span class="s1">&#39;clang&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">:</span><span class="s1">&#39;1.0&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">shutil</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;testfolder&#39;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;testfolder/testfile&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pb</span><span class="o">.</span><span class="n">upload_content</span><span class="p">(</span><span class="s1">&#39;testfolder&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="s1">&#39;testfolder&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;testfolder&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">FileNotFoundError</span>: <span class="n">[Errno 2] No such file or directory: &#39;testfolder&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pb</span><span class="o">.</span><span class="n">download_content</span><span class="p">(</span><span class="s1">&#39;testfolder&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;testfolder&#39;</span><span class="p">)</span>
+<span class="go">[&#39;testfile&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="s1">&#39;testfolder&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pacco.classes.PackageBinary.download_content">
+<code class="sig-name descname">download_content</code><span class="sig-paren">(</span><em class="sig-param">download_dir_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageBinary.download_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download content of uploaded binary from the remote to the <code class="docutils literal notranslate"><span class="pre">download_dir_path</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>download_dir_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the destination of download</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes.PackageBinary.upload_content">
+<code class="sig-name descname">upload_content</code><span class="sig-paren">(</span><em class="sig-param">dir_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageBinary.upload_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the previous binary and upload the content of <code class="docutils literal notranslate"><span class="pre">dir_path</span></code> to the remote.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dir_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the path to the directory to be uploaded</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
