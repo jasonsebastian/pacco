@@ -82,9 +82,18 @@
             
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Classes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#packagemanager">PackageManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#packageregistry">PackageRegistry</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#packagebinary">PackageBinary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#packagemanager">PackageManager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#file-based-implementations">File-based implementations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#packageregistry">PackageRegistry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">File-based implementations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#packagebinary">PackageBinary</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">File-based implementations</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="clients.html">Clients</a></li>
@@ -157,14 +166,75 @@
 <div class="section" id="packagemanager">
 <h2>PackageManager<a class="headerlink" href="#packagemanager" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pacco.classes.PackageManager">
-<em class="property">class </em><code class="sig-prename descclassname">pacco.classes.</code><code class="sig-name descname">PackageManager</code><span class="sig-paren">(</span><em class="sig-param">client</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageManager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Represent the existence of the manager in a remote</p>
+<dt id="pacco.classes_interface.PackageManager">
+<em class="property">class </em><code class="sig-prename descclassname">pacco.classes_interface.</code><code class="sig-name descname">PackageManager</code><span class="sig-paren">(</span><em class="sig-param">client</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent the existence of the manager in a remote. This class is the interface class with the
+expected behavior defined below.</p>
+<dl class="method">
+<dt id="pacco.classes_interface.PackageManager.add_package_registry">
+<code class="sig-name descname">add_package_registry</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">settings_key</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageManager.add_package_registry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new package registry to this package manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the name of the package. For printing purposes only.</p></li>
+<li><p><strong>settings_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the list of keys for the configuration parameter, e.g. [‘os’, ‘compiler’, ‘version’]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#pacco.classes_interface.PackageRegistry" title="pacco.classes_interface.PackageRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageRegistry</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The package registry object.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Exception:</dt><dd><p>FileExistsError: raised if the package with the same name is found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes_interface.PackageManager.delete_package_registry">
+<code class="sig-name descname">delete_package_registry</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageManager.delete_package_registry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a package registry from the package manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the name of the package registry to be deleted.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes_interface.PackageManager.list_package_registries">
+<code class="sig-name descname">list_package_registries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageManager.list_package_registries" title="Permalink to this definition">¶</a></dt>
+<dd><p>List package registries in this package manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes_interface.PackageRegistry" title="pacco.classes_interface.PackageRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageRegistry</span></code></a>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The list of package registry name and package registry object tuples</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="file-based-implementations">
+<h3>File-based implementations<a class="headerlink" href="#file-based-implementations" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pacco.classes_file_based.PackageManagerFileBased">
+<em class="property">class </em><code class="sig-prename descclassname">pacco.classes_file_based.</code><code class="sig-name descname">PackageManagerFileBased</code><span class="sig-paren">(</span><em class="sig-param">client</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageManagerFileBased" title="Permalink to this definition">¶</a></dt>
+<dd><p>An implementation of the PackageManager interface</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pacco.clients</span> <span class="k">import</span> <span class="n">LocalClient</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">LocalClient</span><span class="p">()</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>  <span class="c1"># clean the .pacco directory</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">LocalClient</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pm</span> <span class="o">=</span> <span class="n">PackageManager</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pm</span> <span class="o">=</span> <span class="n">PackageManagerFileBased</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pm</span><span class="o">.</span><span class="n">list_package_registries</span><span class="p">()</span>
 <span class="go">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pm</span><span class="o">.</span><span class="n">add_package_registry</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;os&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">])</span>
@@ -183,8 +253,8 @@
 </pre></div>
 </div>
 <dl class="method">
-<dt id="pacco.classes.PackageManager.add_package_registry">
-<code class="sig-name descname">add_package_registry</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">settings_key</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageManager.add_package_registry" title="Permalink to this definition">¶</a></dt>
+<dt id="pacco.classes_file_based.PackageManagerFileBased.add_package_registry">
+<code class="sig-name descname">add_package_registry</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">settings_key</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageManagerFileBased.add_package_registry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a new package registry to this package manager.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -194,7 +264,7 @@
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pacco.classes.PackageRegistry" title="pacco.classes.PackageRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageRegistry</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#pacco.classes_file_based.PackageRegistryFileBased" title="pacco.classes_file_based.PackageRegistryFileBased"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageRegistryFileBased</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The package registry object.</p>
@@ -207,8 +277,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pacco.classes.PackageManager.delete_package_registry">
-<code class="sig-name descname">delete_package_registry</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageManager.delete_package_registry" title="Permalink to this definition">¶</a></dt>
+<dt id="pacco.classes_file_based.PackageManagerFileBased.delete_package_registry">
+<code class="sig-name descname">delete_package_registry</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageManagerFileBased.delete_package_registry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a package registry from the package manager.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -221,12 +291,12 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pacco.classes.PackageManager.list_package_registries">
-<code class="sig-name descname">list_package_registries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageManager.list_package_registries" title="Permalink to this definition">¶</a></dt>
+<dt id="pacco.classes_file_based.PackageManagerFileBased.list_package_registries">
+<code class="sig-name descname">list_package_registries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageManagerFileBased.list_package_registries" title="Permalink to this definition">¶</a></dt>
 <dd><p>List package registries in this package manager.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes.PackageRegistry" title="pacco.classes.PackageRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageRegistry</span></code></a>]]</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes_file_based.PackageRegistryFileBased" title="pacco.classes_file_based.PackageRegistryFileBased"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageRegistryFileBased</span></code></a>]]</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The list of package registry name and package registry object tuples</p>
@@ -237,17 +307,76 @@
 </dd></dl>
 
 </div>
+</div>
 <div class="section" id="packageregistry">
 <h2>PackageRegistry<a class="headerlink" href="#packageregistry" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pacco.classes.PackageRegistry">
-<em class="property">class </em><code class="sig-prename descclassname">pacco.classes.</code><code class="sig-name descname">PackageRegistry</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">client</em>, <em class="sig-param">settings_key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry" title="Permalink to this definition">¶</a></dt>
-<dd><p>Represent the existence of a package (e.g. openssl) in the package manager</p>
+<dt id="pacco.classes_interface.PackageRegistry">
+<em class="property">class </em><code class="sig-prename descclassname">pacco.classes_interface.</code><code class="sig-name descname">PackageRegistry</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">client</em>, <em class="sig-param">settings_key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageRegistry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent the existence of a package (e.g. openssl) in the package manager.
+This class is the interface class with the expected behavior defined below.</p>
+<dl class="method">
+<dt id="pacco.classes_interface.PackageRegistry.add_package_binary">
+<code class="sig-name descname">add_package_binary</code><span class="sig-paren">(</span><em class="sig-param">settings_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageRegistry.add_package_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new package binary to this registry. Note that this will only declare the existance of the binary
+by creating a new directory, to upload the binary must be done through the <code class="docutils literal notranslate"><span class="pre">PackageBinaryFileBased</span></code>
+object itself.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>settings_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the assignment of key value of the settings_key.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes_interface.PackageBinary" title="pacco.classes_interface.PackageBinary"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinary</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The tuple of the name of the directory name (serialized version of the configuration) and the object</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Exceptions:</dt><dd><p>KeyError: raised if the set of keys in the passed <code class="docutils literal notranslate"><span class="pre">settings_value</span></code> is different with <code class="docutils literal notranslate"><span class="pre">settings_key</span></code>
+FileExistsError: raised if a package binary with the same configuration already exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes_interface.PackageRegistry.delete_package_binary">
+<code class="sig-name descname">delete_package_binary</code><span class="sig-paren">(</span><em class="sig-param">settings_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageRegistry.delete_package_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the package binary folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>settings_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the configuration of the the package binary to be deleted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes_interface.PackageRegistry.list_package_binaries">
+<code class="sig-name descname">list_package_binaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageRegistry.list_package_binaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>List the package binaries registered in this package registry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes_interface.PackageBinary" title="pacco.classes_interface.PackageBinary"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinary</span></code></a>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of tuples of the package binary name and object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="id1">
+<h3>File-based implementations<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pacco.classes_file_based.PackageRegistryFileBased">
+<em class="property">class </em><code class="sig-prename descclassname">pacco.classes_file_based.</code><code class="sig-name descname">PackageRegistryFileBased</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">client</em>, <em class="sig-param">settings_key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageRegistryFileBased" title="Permalink to this definition">¶</a></dt>
+<dd><p>An implementation of the PackageRegistry interface</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pacco.clients</span> <span class="k">import</span> <span class="n">LocalClient</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">LocalClient</span><span class="p">()</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>  <span class="c1"># clean the .pacco directory</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">LocalClient</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pm</span> <span class="o">=</span> <span class="n">PackageManager</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pm</span> <span class="o">=</span> <span class="n">PackageManagerFileBased</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">add_package_registry</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;os&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span><span class="o">.</span><span class="n">list_package_binaries</span><span class="p">()</span>
 <span class="go">[]</span>
@@ -273,16 +402,17 @@
 </pre></div>
 </div>
 <dl class="method">
-<dt id="pacco.classes.PackageRegistry.add_package_binary">
-<code class="sig-name descname">add_package_binary</code><span class="sig-paren">(</span><em class="sig-param">settings_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry.add_package_binary" title="Permalink to this definition">¶</a></dt>
+<dt id="pacco.classes_file_based.PackageRegistryFileBased.add_package_binary">
+<code class="sig-name descname">add_package_binary</code><span class="sig-paren">(</span><em class="sig-param">settings_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageRegistryFileBased.add_package_binary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a new package binary to this registry. Note that this will only declare the existance of the binary
-by creating a new directory, to upload the binary must be done through the <code class="docutils literal notranslate"><span class="pre">PackageBinary</span></code> object itself.</p>
+by creating a new directory, to upload the binary must be done through the <code class="docutils literal notranslate"><span class="pre">PackageBinaryFileBased</span></code>
+object itself.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>settings_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the assignment of key value of the settings_key.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes.PackageBinary" title="pacco.classes.PackageBinary"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinary</span></code></a>]</p>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes_file_based.PackageBinaryFileBased" title="pacco.classes_file_based.PackageBinaryFileBased"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinaryFileBased</span></code></a>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The tuple of the name of the directory name (serialized version of the configuration) and the object</p>
@@ -296,8 +426,8 @@ FileExistsError: raised if a package binary with the same configuration already 
 </dd></dl>
 
 <dl class="method">
-<dt id="pacco.classes.PackageRegistry.delete_package_binary">
-<code class="sig-name descname">delete_package_binary</code><span class="sig-paren">(</span><em class="sig-param">settings_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry.delete_package_binary" title="Permalink to this definition">¶</a></dt>
+<dt id="pacco.classes_file_based.PackageRegistryFileBased.delete_package_binary">
+<code class="sig-name descname">delete_package_binary</code><span class="sig-paren">(</span><em class="sig-param">settings_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageRegistryFileBased.delete_package_binary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete the package binary folder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -307,12 +437,12 @@ FileExistsError: raised if a package binary with the same configuration already 
 </dd></dl>
 
 <dl class="method">
-<dt id="pacco.classes.PackageRegistry.list_package_binaries">
-<code class="sig-name descname">list_package_binaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry.list_package_binaries" title="Permalink to this definition">¶</a></dt>
+<dt id="pacco.classes_file_based.PackageRegistryFileBased.list_package_binaries">
+<code class="sig-name descname">list_package_binaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageRegistryFileBased.list_package_binaries" title="Permalink to this definition">¶</a></dt>
 <dd><p>List the package binaries registered in this package registry</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes.PackageBinary" title="pacco.classes.PackageBinary"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinary</span></code></a>]]</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes_file_based.PackageBinaryFileBased" title="pacco.classes_file_based.PackageBinaryFileBased"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinaryFileBased</span></code></a>]]</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>list of tuples of the package binary name and object</p>
@@ -323,17 +453,55 @@ FileExistsError: raised if a package binary with the same configuration already 
 </dd></dl>
 
 </div>
+</div>
 <div class="section" id="packagebinary">
 <h2>PackageBinary<a class="headerlink" href="#packagebinary" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pacco.classes.PackageBinary">
-<em class="property">class </em><code class="sig-prename descclassname">pacco.classes.</code><code class="sig-name descname">PackageBinary</code><span class="sig-paren">(</span><em class="sig-param">client</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageBinary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Represent the existence of a package (e.g. openssl) in the package manager</p>
+<dt id="pacco.classes_interface.PackageBinary">
+<em class="property">class </em><code class="sig-prename descclassname">pacco.classes_interface.</code><code class="sig-name descname">PackageBinary</code><span class="sig-paren">(</span><em class="sig-param">client</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageBinary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent the existence of a package (e.g. openssl) in the package manager
+This class is the interface class with the expected behavior defined below.</p>
+<dl class="method">
+<dt id="pacco.classes_interface.PackageBinary.download_content">
+<code class="sig-name descname">download_content</code><span class="sig-paren">(</span><em class="sig-param">download_dir_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageBinary.download_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download content of uploaded binary from the remote to the <code class="docutils literal notranslate"><span class="pre">download_dir_path</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>download_dir_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the destination of download</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes_interface.PackageBinary.upload_content">
+<code class="sig-name descname">upload_content</code><span class="sig-paren">(</span><em class="sig-param">dir_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_interface.PackageBinary.upload_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the previous binary and upload the content of <code class="docutils literal notranslate"><span class="pre">dir_path</span></code> to the remote.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dir_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the path to the directory to be uploaded</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="id2">
+<h3>File-based implementations<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pacco.classes_file_based.PackageBinaryFileBased">
+<em class="property">class </em><code class="sig-prename descclassname">pacco.classes_file_based.</code><code class="sig-name descname">PackageBinaryFileBased</code><span class="sig-paren">(</span><em class="sig-param">client</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageBinaryFileBased" title="Permalink to this definition">¶</a></dt>
+<dd><p>An implementation of the PackageBinary interface</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pacco.clients</span> <span class="k">import</span> <span class="n">LocalClient</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">LocalClient</span><span class="p">()</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>  <span class="c1"># clean the .pacco directory</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">LocalClient</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pm</span> <span class="o">=</span> <span class="n">PackageManager</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pm</span> <span class="o">=</span> <span class="n">PackageManagerFileBased</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">add_package_registry</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;os&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">,</span> <span class="n">pb</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">add_package_binary</span><span class="p">({</span><span class="s1">&#39;os&#39;</span><span class="p">:</span><span class="s1">&#39;osx&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">:</span><span class="s1">&#39;clang&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">:</span><span class="s1">&#39;1.0&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">shutil</span>
@@ -352,8 +520,8 @@ FileExistsError: raised if a package binary with the same configuration already 
 </pre></div>
 </div>
 <dl class="method">
-<dt id="pacco.classes.PackageBinary.download_content">
-<code class="sig-name descname">download_content</code><span class="sig-paren">(</span><em class="sig-param">download_dir_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageBinary.download_content" title="Permalink to this definition">¶</a></dt>
+<dt id="pacco.classes_file_based.PackageBinaryFileBased.download_content">
+<code class="sig-name descname">download_content</code><span class="sig-paren">(</span><em class="sig-param">download_dir_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageBinaryFileBased.download_content" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download content of uploaded binary from the remote to the <code class="docutils literal notranslate"><span class="pre">download_dir_path</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -366,8 +534,8 @@ FileExistsError: raised if a package binary with the same configuration already 
 </dd></dl>
 
 <dl class="method">
-<dt id="pacco.classes.PackageBinary.upload_content">
-<code class="sig-name descname">upload_content</code><span class="sig-paren">(</span><em class="sig-param">dir_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageBinary.upload_content" title="Permalink to this definition">¶</a></dt>
+<dt id="pacco.classes_file_based.PackageBinaryFileBased.upload_content">
+<code class="sig-name descname">upload_content</code><span class="sig-paren">(</span><em class="sig-param">dir_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes_file_based.PackageBinaryFileBased.upload_content" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove the previous binary and upload the content of <code class="docutils literal notranslate"><span class="pre">dir_path</span></code> to the remote.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -381,6 +549,7 @@ FileExistsError: raised if a package binary with the same configuration already 
 
 </dd></dl>
 
+</div>
 </div>
 </div>
 
