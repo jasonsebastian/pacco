@@ -165,7 +165,7 @@ class PackageRegistry:
         """
         if set(settings_value.keys()) != set(self.settings_key):
             raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
-                                                                               sorted(self.settings_key)))
+                                                                     sorted(self.settings_key)))
         dir_name = PackageRegistry.__generate_dir_name_from_settings_value(settings_value)
         if dir_name in self.client.ls():
             raise FileExistsError("such binary already exist")
@@ -184,16 +184,50 @@ class PackageRegistry:
 
 
 class PackageBinary:
+    """
+        Represent the existence of a package (e.g. openssl) in the package manager
+
+        Examples:
+            >>> from pacco.clients import LocalClient
+            >>> LocalClient().rmdir('')  # clean the .pacco directory
+            >>> client = LocalClient()
+            >>> pm = PackageManager(client)
+            >>> pr = pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
+            >>> name, pb = pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
+            >>> import os, shutil
+            >>> os.makedirs('testfolder', exist_ok=True)
+            >>> open('testfolder/testfile', 'w').close()
+            >>> pb.upload_content('testfolder')
+            >>> shutil.rmtree('testfolder')
+            >>> os.listdir('testfolder')
+            Traceback (most recent call last):
+                ...
+            FileNotFoundError: [Errno 2] No such file or directory: 'testfolder'
+            >>> pb.download_content('testfolder')
+            >>> os.listdir('testfolder')
+            ['testfile']
+            >>> shutil.rmtree('testfolder')
+    """
     def __init__(self, client: FileBasedClientAbstract):
         self.client = client
 
     def __repr__(self):
         return "PackageBinaryObject"
 
-    def download_content(self, download_path: str) -> None:
-        self.client.download_dir(download_path)
+    def download_content(self, download_dir_path: str) -> None:
+        """
+        Download content of uploaded binary from the remote to the ``download_dir_path``
+
+        Args:
+            download_dir_path: the destination of download
+        """
+        self.client.download_dir(download_dir_path)
 
     def upload_content(self, dir_path: str) -> None:
-        self.client.rmdir('')
-        self.client.mkdir('')
+        """
+        Remove the previous binary and upload the content of ``dir_path`` to the remote.
+
+        Args:
+            dir_path: the path to the directory to be uploaded
+        """
         self.client.upload_dir(dir_path)

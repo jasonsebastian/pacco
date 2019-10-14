@@ -81,6 +81,7 @@ class LocalClient(FileBasedClientAbstract):
         else:
             self.__root_dir = os.path.join(str(Path.home()), '.pacco')
             os.makedirs(self.__root_dir, exist_ok=True)
+        self.__bin_dir = os.path.join(self.__root_dir, 'bin')
 
     def ls(self) -> List[str]:
         return os.listdir(self.__root_dir)
@@ -95,9 +96,8 @@ class LocalClient(FileBasedClientAbstract):
         return LocalClient(os.path.join(self.__root_dir, name))
 
     def download_dir(self, download_path: str) -> None:
-        shutil.copy(self.__root_dir, download_path)
+        shutil.copytree(self.__bin_dir, download_path)
 
     def upload_dir(self, dir_path: str) -> None:
-        shutil.rmtree(self.__root_dir)
-        os.makedirs(self.__root_dir)
-        shutil.copy(dir_path, self.__root_dir)
+        shutil.rmtree(self.__bin_dir, ignore_errors=True)
+        shutil.copytree(dir_path, self.__bin_dir)
