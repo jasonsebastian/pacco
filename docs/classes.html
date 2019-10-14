@@ -175,6 +175,58 @@
 <span class="go">[(&#39;boost&#39;, PR[boost, os, target, type])]</span>
 </pre></div>
 </div>
+<dl class="method">
+<dt id="pacco.classes.PackageManager.add_package_registry">
+<code class="sig-name descname">add_package_registry</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">settings_key</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageManager.add_package_registry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new package registry to this package manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the name of the package. For printing purposes only.</p></li>
+<li><p><strong>settings_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the list of keys for the configuration parameter, e.g. [‘os’, ‘compiler’, ‘version’]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#pacco.classes.PackageRegistry" title="pacco.classes.PackageRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageRegistry</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The package registry object.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Exception:</dt><dd><p>FileExistsError: raised if the package with the same name is found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes.PackageManager.delete_package_registry">
+<code class="sig-name descname">delete_package_registry</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageManager.delete_package_registry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a package registry from the package manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the name of the package registry to be deleted.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes.PackageManager.list_package_registries">
+<code class="sig-name descname">list_package_registries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageManager.list_package_registries" title="Permalink to this definition">¶</a></dt>
+<dd><p>List package registries in this package manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#pacco.classes.PackageRegistry" title="pacco.classes.PackageRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackageRegistry</span></code></a>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The list of package registry name and package registry object tuples</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -210,6 +262,54 @@
 <span class="go">[(&#39;compiler=gcc==os=linux==version=1.0&#39;, PackageBinaryObject)]</span>
 </pre></div>
 </div>
+<dl class="method">
+<dt id="pacco.classes.PackageRegistry.add_package_binary">
+<code class="sig-name descname">add_package_binary</code><span class="sig-paren">(</span><em class="sig-param">settings_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry.add_package_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new package binary to this registry. Note that this will only declare the existance of the binary
+by creating a new directory, to upload the binary must be done through the <code class="docutils literal notranslate"><span class="pre">PackageBinary</span></code> object itself.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>settings_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the assignment of key value of the settings_key.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinary</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The tuple of the name of the directory name (serialized version of the configuration) and the object</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Exceptions:</dt><dd><p>KeyError: raised if the set of keys in the passed <code class="docutils literal notranslate"><span class="pre">settings_value</span></code> is different with <code class="docutils literal notranslate"><span class="pre">settings_key</span></code>
+FileExistsError: raised if a package binary with the same configuration already exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes.PackageRegistry.delete_package_binary">
+<code class="sig-name descname">delete_package_binary</code><span class="sig-paren">(</span><em class="sig-param">settings_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry.delete_package_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the package binary folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>settings_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the configuration of the the package binary to be deleted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pacco.classes.PackageRegistry.list_package_binaries">
+<code class="sig-name descname">list_package_binaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pacco.classes.PackageRegistry.list_package_binaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>List the package binaries registered in this package registry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PackageBinary</span></code>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of tuples of the package binary name and object</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
