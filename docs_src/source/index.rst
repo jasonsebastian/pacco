@@ -6,5 +6,6 @@ Pacco Documentation
    :maxdepth: 2
 
    classes
+   clients
 
 .. image:: diagrams/pacco.png
