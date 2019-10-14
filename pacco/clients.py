@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 from pathlib import Path
-from typing import List, Tuple, Type, Optional
+from typing import List, Optional
 
 
 class FileBasedClientAbstract:
@@ -30,7 +30,16 @@ class FileBasedClientAbstract:
         """
         raise NotImplementedError()
 
-    def dispatch_subdir(self, name: str) -> Type[FileBasedClientAbstract]:
+    def mkdir(self, name: str) -> None:
+        """
+        Create a new directory under the current directory
+
+        Args:
+            name: The name of the directory ot be created
+        """
+        raise NotImplementedError()
+
+    def dispatch_subdir(self, name: str) -> FileBasedClientAbstract:
         """
         Create and return new instance whose context is the join of this current directory with ``name``.
 
@@ -77,6 +86,9 @@ class LocalClient(FileBasedClientAbstract):
 
     def rmdir(self, name: str) -> None:
         shutil.rmtree(os.path.join(self.__root_dir, name))
+
+    def mkdir(self, name: str) -> None:
+        os.makedirs(os.path.join(self.__root_dir, name))
 
     def dispatch_subdir(self, name: str) -> LocalClient:
         return LocalClient(os.path.join(self.__root_dir, name))
