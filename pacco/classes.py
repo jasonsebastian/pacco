@@ -31,18 +31,40 @@ class PackageManager:
         [('boost', PR[boost, os, target, type])]
     """
     def __init__(self, client: FileBasedClientAbstract):
-
         self.client = client
 
     def list_package_registries(self) -> List[Tuple[str, PackageRegistry]]:
+        """
+        List package registries in this package manager.
+
+        Returns:
+            The list of package registry name and package registry object tuples
+        """
         dir_names = self.client.ls()
         return sorted([(dir_name, PackageRegistry(dir_name, self.client.dispatch_subdir(dir_name)))
                        for dir_name in dir_names], key=lambda x: x[0])
 
-    def delete_package_registry(self, name: str):
+    def delete_package_registry(self, name: str) -> None:
+        """
+        Delete a package registry from the package manager.
+
+        Args:
+            name: the name of the package registry to be deleted.
+        """
         self.client.rmdir(name)
 
     def add_package_registry(self, name: str, settings_key: List[str]) -> PackageRegistry:
+        """
+        Add a new package registry to this package manager.
+
+        Args:
+            name: the name of the package. For printing purposes only.
+            settings_key: the list of keys for the configuration parameter, e.g. ['os', 'compiler', 'version']
+        Returns:
+            The package registry object.
+        Exception:
+            FileExistsError: raised if the package with the same name is found
+        """
         dirs = self.client.ls()
         if name in dirs:
             raise FileExistsError("The package registry {} is already found".format(name))
@@ -118,11 +140,29 @@ class PackageRegistry:
         return '=='.join(zipped_assignments)
 
     def list_package_binaries(self) -> List[Tuple[str, PackageBinary]]:
+        """
+        List the package binaries registered in this package registry
+
+        Returns:
+            list of tuples of the package binary name and object
+        """
         dirs = self.client.ls()
         dirs.remove(self.__generate_settings_key_dir_name(self.settings_key))
         return sorted([(name, PackageBinary(self.client.dispatch_subdir(name))) for name in dirs], key=lambda x: x[0])
 
     def add_package_binary(self, settings_value: Dict[str, str]) -> Tuple[str, PackageBinary]:
+        """
+        Add a new package binary to this registry. Note that this will only declare the existance of the binary
+        by creating a new directory, to upload the binary must be done through the ``PackageBinary`` object itself.
+
+        Args:
+            settings_value: the assignment of key value of the settings_key.
+        Returns:
+            The tuple of the name of the directory name (serialized version of the configuration) and the object
+        Exceptions:
+            KeyError: raised if the set of keys in the passed ``settings_value`` is different with ``settings_key``
+            FileExistsError: raised if a package binary with the same configuration already exist.
+        """
         if set(settings_value.keys()) != set(self.settings_key):
             raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
                                                                                sorted(self.settings_key)))
@@ -133,6 +173,12 @@ class PackageRegistry:
         return dir_name, PackageBinary(self.client.dispatch_subdir(dir_name))
 
     def delete_package_binary(self, settings_value: Dict[str, str]):
+        """
+        Delete the package binary folder
+
+        Args:
+            settings_value: the configuration of the the package binary to be deleted
+        """
         dir_name = PackageRegistry.__generate_dir_name_from_settings_value(settings_value)
         self.client.rmdir(dir_name)
 
