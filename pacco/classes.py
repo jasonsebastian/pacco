@@ -16,7 +16,7 @@ import json
 import logging
 from typing import Dict, List, Any, Optional
 
-from pacco.clients import Client
+from pacco.clients import LocalClient
 
 ALLOWED_STRINGS_FILE_NAME = "allowed_settings.txt"
 
@@ -34,7 +34,7 @@ class PackageRegistry:
         Thus, only use the ``allowed_settings`` options when creating new package registry.
 
     """
-    def __init__(self, name: str, client: Client, allowed_settings: Optional[Dict[str, List[str]]] = None) -> None:
+    def __init__(self, name: str, client:LocalClient, allowed_settings: Optional[Dict[str, List[str]]] = None) -> None:
         """
             Attributes:
                 name: the name of the package
@@ -84,7 +84,7 @@ class PackageRegistry:
 
 
 class BinaryPackage:
-    def __init__(self, client: Client, settings: Optional[Dict[str, str]] = None) -> None:
+    def __init__(self, client:LocalClient, settings: Optional[Dict[str, str]] = None) -> None:
         self.client = client
         self.settings = settings
         self.settings_sha = BinaryPackage.__make_sha_from_settings(self.settings)
