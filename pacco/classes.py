@@ -63,7 +63,7 @@ class PackageRegistry:
 
     def list_package_binaries(self) -> Dict[Dict[str, str], PackageBinary]:
         dirs = self.client.ls()
-        dirs.remove(self.__generate_settings_key_dir_name())
+        dirs.remove(self.__generate_settings_key_dir_name(self.settings_key))
         return {PackageRegistry.__parse_settings_value(name): PackageBinary(self.client.dispatch_subdir(name))
                 for name in dirs}
 
@@ -85,4 +85,6 @@ class PackageBinary:
         self.client.download_dir(download_path)
 
     def upload_content(self, dir_path: str) -> None:
+        self.client.rmdir('')
+        self.client.mkdir('')
         self.client.upload_dir(dir_path)
