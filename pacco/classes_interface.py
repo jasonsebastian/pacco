@@ -45,6 +45,19 @@ class PackageManager:
         """
         raise NotImplementedError()
 
+    def get_package_registry(self, name: str) -> PackageRegistry:
+        """
+        Get a reference to the ``PackageRegistry`` object based on the settings value
+
+        Args:
+            name: the name of the package registry to get
+        Returns:
+            the object
+        Exceptions:
+            FileNotFoundError: when that package is not found or it is not set properly.
+        """
+        raise NotImplementedError()
+
 
 class PackageRegistry:
     """
@@ -98,6 +111,9 @@ class PackageRegistry:
             settings_value: the configuration of the the package binary to get
         Returns:
             the object
+        Exceptions:
+            KeyError: when the key of the settings passed is not correct
+            FileNotFoundError: when there is no binary with the configuration of settings value
         """
         raise NotImplementedError()
 

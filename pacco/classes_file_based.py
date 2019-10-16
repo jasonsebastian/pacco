@@ -30,6 +30,8 @@ class PackageManagerFileBased(PackageManager):
         >>> pm.delete_package_registry('openssl')
         >>> pm.list_package_registries()
         [('boost', PR[boost, os, target, type])]
+        >>> pm.get_package_registry('boost')
+        PR[boost, os, target, type]
     """
     def __init__(self, client: FileBasedClientAbstract):
         if not isinstance(client, FileBasedClientAbstract):
@@ -50,6 +52,12 @@ class PackageManagerFileBased(PackageManager):
             raise FileExistsError("The package registry {} is already found".format(name))
         self.client.mkdir(name)
         return PackageRegistryFileBased(name, self.client.dispatch_subdir(name), settings_key)
+
+    def get_package_registry(self, name: str) -> PackageRegistryFileBased:
+        dirs = self.client.ls()
+        if name not in dirs:
+            raise FileNotFoundError("The package registry {} is not found".format(name))
+        return PackageRegistryFileBased(name, self.client.dispatch_subdir(name))
 
 
 class PackageRegistryFileBased(PackageRegistry):
@@ -94,7 +102,9 @@ class PackageRegistryFileBased(PackageRegistry):
         super(PackageRegistryFileBased, self).__init__(name, client, settings_key)
         from_remote = self.__get_settings_key()
         if settings_key is None and from_remote is None:
-            raise FileNotFoundError("declare settings_key")
+            raise FileNotFoundError("you need to declare settings_key if you are adding, if you are getting, this"
+                                    "means that the package registry is not properly set, you need to delete and"
+                                    "add again")
         elif from_remote is not None:  # ignore the passed settings_key and use the remote one
             self.settings_key = from_remote
         else:
