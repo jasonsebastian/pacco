@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import io
 import os
+import re
 import shutil
 from pathlib import Path
 from typing import List, Optional
+
+import requests
+from bs4 import BeautifulSoup
 
 
 class ClientAbstract:
@@ -79,13 +84,17 @@ class LocalClient(FileBasedClientAbstract):
     """
     An implementation of ``FileBasedClientAbstract``, using ``homepath/.pacco`` as the file storage.
     """
-    def __init__(self, path: Optional[str] = "") -> None:
+    def __init__(self, path: Optional[str] = "", clean: Optional[bool] = False) -> None:
         if path:
             self.__root_dir = path
         else:
             self.__root_dir = os.path.join(str(Path.home()), '.pacco')
             os.makedirs(self.__root_dir, exist_ok=True)
         self.__bin_dir = os.path.join(self.__root_dir, 'bin')
+
+        if clean:
+            self.rmdir(self.__root_dir)
+            os.makedirs(self.__root_dir)
 
     def ls(self) -> List[str]:
         return os.listdir(self.__root_dir)
@@ -105,3 +114,56 @@ class LocalClient(FileBasedClientAbstract):
     def upload_dir(self, dir_path: str) -> None:
         shutil.rmtree(self.__bin_dir, ignore_errors=True)
         shutil.copytree(dir_path, self.__bin_dir)
+
+
+class NexusFileClient(FileBasedClientAbstract):
+    """
+    An implementation of ``FileBasedClientAbstract``, using Nexus site repository as the file storage.
+    """
+    def __init__(self, url: str, username: str, password: str, clean: Optional[bool] = False) -> None:
+        if not re.match(r'https?://(\w+\.)*(\w+)(:\d+)?/(\w+/)*', url):
+            raise ValueError("URL not valid, make sure you have trailing slash")
+        self.__url = url
+        self.__username = username
+        self.__password = password
+        self.__dummy_stream = io.StringIO(".pacco")
+
+        resp = requests.post(url+".pacco", auth=(self.__username, self.__password), data=self.__dummy_stream)
+        if resp.status_code not in [200, 201, 204]:
+            raise ConnectionError("Connection seems failed, HTTP status code {}".format(resp.status_code))
+        self.__bin_dir = url + 'bin/'
+
+        if clean:
+            dir_names = self.ls()
+            for dir_name in dir_names:
+                self.rmdir(dir_name)
+
+    @staticmethod
+    def __validate_status_code(received: int, expected: List[int]) -> None:
+        if received not in expected:
+            raise ValueError("Receiving http status {}, expecting one of {}".format(received, expected))
+
+    def ls(self) -> List[str]:
+        resp = requests.get(self.__url, auth=(self.__username, self.__password))
+        NexusFileClient.__validate_status_code(resp.status_code, [200])
+        soup = BeautifulSoup(resp.content, 'html.parser')
+        content = [str(tr.td.a.text)[:-1] for tr in soup.find_all('tr')[2:]]  # skip table header and parent dir
+        return content
+
+    def rmdir(self, name: str) -> None:
+        resp = requests.delete(self.__url+name+'/', auth=(self.__username, self.__password))
+        NexusFileClient.__validate_status_code(resp.status_code, [200, 204])
+
+    def mkdir(self, name: str) -> None:
+        resp = requests.post(self.__url+name+"/.pacco", auth=(self.__username, self.__password),
+                             data=self.__dummy_stream)
+        NexusFileClient.__validate_status_code(resp.status_code, [200, 201])
+
+    def dispatch_subdir(self, name: str) -> NexusFileClient:
+        return NexusFileClient(self.__url+name+'/', self.__username, self.__password)
+
+    def download_dir(self, download_path: str) -> None:
+        pass
+
+    def upload_dir(self, dir_path: str) -> None:
+        pass
