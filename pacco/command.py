@@ -28,12 +28,6 @@ class Command:
             self.__show_help()
 
     def __get_commands(self):
-        """
-        Derive the available commands from this class.
-
-        Returns:
-             list of available commands
-        """
         result = {}
         for m in inspect.getmembers(self, predicate=inspect.ismethod):
             method_name = m[0]
