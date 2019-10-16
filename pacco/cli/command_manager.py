@@ -29,12 +29,6 @@ class CommandManager:
             self.__show_help()
 
     def __get_commands(self) -> Dict[str, Callable]:
-        """
-        Derive the available commands from this class.
-
-        Returns:
-             list of available commands
-        """
         result = {}
         for method_name, method in inspect.getmembers(self, predicate=inspect.ismethod):
             if not method_name.startswith('_') and method_name != "run":
