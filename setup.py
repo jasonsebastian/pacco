@@ -7,5 +7,10 @@ setup(
     author="Kevin Winata",
     author_email="kevinwinatamichael@gmail.com",
     description="A simple package manager (used for prebuilt binary), interoperable with Nexus repository manager",
-    url="http://kwinata.github.io/pacco/"
+    url="https://kwinata.github.io/pacco/",
+    entry_points={
+        'console_scripts': [
+            'pacco=pacco.cli.entry_point:run'
+        ]
+    }
 )
