@@ -10,8 +10,6 @@ class PackageManagerFileBased(PackageManager):
     """
     An implementation of the PackageManager interface
 
-    # >>> LocalClient().rmdir('')  # clean the .pacco directory
-    # >>> client = LocalClient()
     Examples:
         >>> from pacco.clients import LocalClient, NexusFileClient
         >>> client = NexusFileClient('http://localhost:8081/nexus/content/sites/pacco/', 'admin', 'admin123', clean=True)
@@ -168,9 +166,8 @@ class PackageBinaryFileBased(PackageBinary):
     An implementation of the PackageBinary interface
 
     Examples:
-        >>> from pacco.clients import LocalClient
-        >>> LocalClient().rmdir('')  # clean the .pacco directory
-        >>> client = LocalClient()
+        >>> from pacco.clients import LocalClient, NexusFileClient
+        >>> client = NexusFileClient('http://localhost:8081/nexus/content/sites/pacco/', 'admin', 'admin123', clean=True)
         >>> pm = PackageManagerFileBased(client)
         >>> pr = pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
         >>> name, pb = pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
