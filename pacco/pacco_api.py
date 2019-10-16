@@ -1,8 +1,30 @@
+from pacco.classes_file_based import PackageManagerFileBased
+from pacco.clients import LocalClient
+from pacco.output import PaccoOutput
+
+
 class PaccoAPIV1:
-    def download(self, registry, *settings):
-        print("Downloading {} with the following settings...".format(registry))
-        for s in settings:
-            print("{}".format(s))
+    def __init__(self):
+        self.__client = LocalClient()
+        self.__pm = PackageManagerFileBased(self.__client)
+        self.out = PaccoOutput()
+
+    def download(self, registry, path, *settings):
+        def get_settings_dict(args):
+            d = {}
+            for s in args:
+                if "=" not in s:
+                    raise ValueError("settings must be in the form of <key>=<value>")
+                key, value = s.split("=")
+                d[key] = value
+            return d
+
+        try:
+            pr = self.__pm.get_package_registry(registry)
+            pb = pr.get_package_binary(get_settings_dict(settings))
+            pb.download_content(path)
+        except KeyError or ValueError as exc:
+            self.out.writeln("{}".format(str(exc)), error=True)
 
 
 Pacco = PaccoAPIV1
