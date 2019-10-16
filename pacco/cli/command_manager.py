@@ -2,23 +2,23 @@ import argparse
 import inspect
 from typing import Callable, Dict
 
-from pacco.pacco_api import Pacco
+from pacco.cli.pacco_api import PaccoAPI
 
 
-class Command:
+class CommandManager:
     def __init__(self, pacco_api):
         self.__pacco = pacco_api
         self.__out = pacco_api.out
 
     def run(self, *args):
-        """HIDDEN
+        """
         Entry point for executing commands, dispatcher to class methods.
         """
         try:
-            command = args[0][0]
+            command = args[0]
             commands = self.__get_commands()
             method = commands[command]
-            remaining_args = args[0][1:]
+            remaining_args = args[1:]
             method(remaining_args)
         except KeyError as exc:
             if command in ["-h", "--help"]:
@@ -36,12 +36,9 @@ class Command:
              list of available commands
         """
         result = {}
-        for m in inspect.getmembers(self, predicate=inspect.ismethod):
-            method_name = m[0]
-            if not method_name.startswith('_'):
-                method = m[1]
-                if method.__doc__ and not method.__doc__.startswith('HIDDEN'):
-                    result[method_name] = method
+        for method_name, method in inspect.getmembers(self, predicate=inspect.ismethod):
+            if not method_name.startswith('_') and method_name != "run":
+                result[method_name] = method
         return result
 
     def __show_help(self):
@@ -72,6 +69,5 @@ class Command:
 
 
 def main(args):
-    pacco_api = Pacco()
-    command = Command(pacco_api)
-    command.run(args)
+    pacco_api = PaccoAPI()
+    CommandManager(pacco_api).run(*args)

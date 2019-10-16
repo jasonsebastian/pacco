@@ -1,13 +1,13 @@
 from pacco.classes_file_based import PackageManagerFileBased
 from pacco.clients import LocalClient
-from pacco.output import PaccoOutput
+from pacco.cli.output_stream import OutputStream
 
 
 class PaccoAPIV1:
     def __init__(self):
         self.__client = LocalClient()
         self.__pm = PackageManagerFileBased(self.__client)
-        self.out = PaccoOutput()
+        self.out = OutputStream()
 
     def download(self, registry: str, path: str, *settings: str):
         """
@@ -36,4 +36,4 @@ class PaccoAPIV1:
             self.out.writeln("{}".format(str(exc)), error=True)
 
 
-Pacco = PaccoAPIV1
+PaccoAPI = PaccoAPIV1

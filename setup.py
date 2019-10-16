@@ -10,7 +10,7 @@ setup(
     url="https://kwinata.github.io/pacco/",
     entry_points={
         'console_scripts': [
-            'pacco=pacco.pacco:run'
+            'pacco=pacco.cli.entry_point:run'
         ]
     }
 )

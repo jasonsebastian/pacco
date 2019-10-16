@@ -1,7 +1,7 @@
 import sys
 
 
-class PaccoOutput:
+class OutputStream:
     def __init__(self):
         self._stream = sys.stdout
         self._stream_err = sys.stderr
