@@ -10,6 +10,14 @@ class PaccoAPIV1:
         self.out = PaccoOutput()
 
     def download(self, registry, path, *settings):
+        """
+        Download binary, implemented using Pacco's predefined classes and methods.
+
+        Args:
+            registry: name of binary
+            path: path to download binary
+            settings: configuration of binary to be downloaded
+        """
         def get_settings_dict(args):
             d = {}
             for s in args:

@@ -54,7 +54,7 @@ class Command:
 
     def download(self, *args):
         """
-        Download binary by specifying registry.
+        Download binary by specifying registry, path and settings.
         """
         parser = argparse.ArgumentParser(prog="pacco download")
         parser.add_argument("registry", help="which registry to download")
