@@ -90,6 +90,17 @@ class PackageRegistry:
         """
         raise NotImplementedError()
 
+    def get_package_binary(self, settings_value: Dict[str, str]) -> PackageBinary:
+        """
+        Get a reference to the ``PackageBinary`` object based on the settings value
+
+        Args:
+            settings_value: the configuration of the the package binary to get
+        Returns:
+            the object
+        """
+        raise NotImplementedError()
+
 
 class PackageBinary:
     """

@@ -84,6 +84,8 @@ class PackageRegistryFileBased(PackageRegistry):
         >>> pr.delete_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
         >>> pr.list_package_binaries()
         [('compiler=gcc==os=linux==version=1.0', PackageBinaryObject)]
+        >>> pr.get_package_binary({'os':'linux', 'compiler':'gcc', 'version':'1.0'})
+        PackageBinaryObject
     """
 
     def __init__(self, name: str, client: FileBasedClientAbstract, settings_key: Optional[List[str]] = None):
@@ -141,6 +143,15 @@ class PackageRegistryFileBased(PackageRegistry):
         dir_name = PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)
         self.client.rmdir(dir_name)
 
+    def get_package_binary(self, settings_value: Dict[str, str]) -> PackageBinaryFileBased:
+        dir_name = PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)
+        if set(settings_value.keys()) != set(self.settings_key):
+            raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
+                                                                     sorted(self.settings_key)))
+        if dir_name not in self.client.ls():
+            raise FileNotFoundError("such configuration does not exist")
+        return PackageBinaryFileBased(self.client.dispatch_subdir(dir_name))
+
 
 class PackageBinaryFileBased(PackageBinary):
     """
@@ -162,7 +173,8 @@ class PackageBinaryFileBased(PackageBinary):
         Traceback (most recent call last):
             ...
         FileNotFoundError: [Errno 2] No such file or directory: 'testfolder'
-        >>> pb.download_content('testfolder')
+        >>> pb_get = pr.get_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})  # use a new reference
+        >>> pb_get.download_content('testfolder')
         >>> os.listdir('testfolder')
         ['testfile']
         >>> shutil.rmtree('testfolder')
