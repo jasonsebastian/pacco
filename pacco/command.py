@@ -1,5 +1,6 @@
 import argparse
 import inspect
+from typing import Callable, Dict
 
 from pacco.pacco_api import Pacco
 
@@ -27,7 +28,7 @@ class Command:
         except IndexError:  # commands specified
             self.__show_help()
 
-    def __get_commands(self):
+    def __get_commands(self) -> Dict[str, Callable]:
         """
         Derive the available commands from this class.
 
@@ -58,7 +59,7 @@ class Command:
         self.__out.writeln("")
         self.__out.writeln("Pacco commands. Type 'pacco <command> -h' for help")
 
-    def download(self, *args):
+    def download(self, *args: str):
         """
         Download binary by specifying registry, path and settings.
         """

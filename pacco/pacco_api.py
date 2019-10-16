@@ -9,7 +9,7 @@ class PaccoAPIV1:
         self.__pm = PackageManagerFileBased(self.__client)
         self.out = PaccoOutput()
 
-    def download(self, registry, path, *settings):
+    def download(self, registry: str, path: str, *settings: str):
         """
         Download binary, implemented using Pacco's predefined classes and methods.
 
