@@ -18,6 +18,7 @@ class PaccoAPIV1:
             path: path to download binary
             settings: configuration of binary to be downloaded
         """
+
         def get_settings_dict(args):
             d = {}
             for s in args:
