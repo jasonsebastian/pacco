@@ -110,7 +110,11 @@ class LocalClient(FileBasedClientAbstract):
         return LocalClient(os.path.join(self.__root_dir, name))
 
     def download_dir(self, download_path: str) -> None:
-        shutil.copytree(self.__bin_dir, download_path)
+        for file_name in glob.iglob(os.path.join(self.__bin_dir, '**/*'), recursive=True):
+            if os.path.isdir(file_name):
+                shutil.copytree(file_name, os.path.join(download_path, file_name))
+            else:
+                shutil.copy(file_name, os.path.join(download_path, os.path.relpath(file_name, self.__bin_dir)))
 
     def upload_dir(self, dir_path: str) -> None:
         shutil.rmtree(self.__bin_dir, ignore_errors=True)

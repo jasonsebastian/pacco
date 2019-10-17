@@ -175,15 +175,11 @@ class PackageBinaryFileBased(PackageBinary):
         >>> os.makedirs('testfolder', exist_ok=True)
         >>> open('testfolder/testfile', 'w').close()
         >>> pb.upload_content('testfolder')
-        >>> shutil.rmtree('testfolder')
-        >>> os.listdir('testfolder')
-        Traceback (most recent call last):
-            ...
-        FileNotFoundError: [Errno 2] No such file or directory: 'testfolder'
+        >>> __ = shutil.move('testfolder/testfile', 'testfolder/testfile2')
         >>> pb_get = pr.get_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})  # use a new reference
         >>> pb_get.download_content('testfolder')
-        >>> os.listdir('testfolder')
-        ['testfile']
+        >>> sorted(os.listdir('testfolder'))
+        ['testfile', 'testfile2']
         >>> shutil.rmtree('testfolder')
     """
 
