@@ -26,10 +26,10 @@ class PackageManagerFileBased(PackageManager):
             ...
         FileExistsError: The package registry openssl is already found
         >>> pm.list_package_registries()
-        [('boost', PR[boost, os, target, type]), ('openssl', PR[openssl, compiler, os, version])]
+        ['boost', 'openssl']
         >>> pm.delete_package_registry('openssl')
         >>> pm.list_package_registries()
-        [('boost', PR[boost, os, target, type])]
+        ['boost']
         >>> pm.get_package_registry('boost')
         PR[boost, os, target, type]
     """
@@ -38,10 +38,8 @@ class PackageManagerFileBased(PackageManager):
             raise TypeError("Must be using FileBasedClient")
         super(PackageManagerFileBased, self).__init__(client)
 
-    def list_package_registries(self) -> List[Tuple[str, PackageRegistryFileBased]]:
-        dir_names = self.client.ls()
-        return sorted([(dir_name, PackageRegistryFileBased(dir_name, self.client.dispatch_subdir(dir_name)))
-                       for dir_name in dir_names], key=lambda x: x[0])
+    def list_package_registries(self) -> List[str]:
+        return sorted(self.client.ls())
 
     def delete_package_registry(self, name: str) -> None:
         self.client.rmdir(name)
@@ -140,11 +138,10 @@ class PackageRegistryFileBased(PackageRegistry):
             raise ValueError("Invalid dir_name syntax {}".format(dir_name))
         return {arg.split('=')[0]: arg.split('=')[1] for arg in dir_name.split('==')}
 
-    def list_package_binaries(self) -> List[Tuple[Dict[str, str], PackageBinaryFileBased]]:
+    def list_package_binaries(self) -> List[Dict[str, str]]:
         dirs = self.client.ls()
         dirs.remove(self.__generate_settings_key_dir_name(self.settings_key))
-        return [(PackageRegistryFileBased.__generate_settings_value_from_dir_name(name),
-                 PackageBinaryFileBased(self.client.dispatch_subdir(name))) for name in dirs]
+        return [PackageRegistryFileBased.__generate_settings_value_from_dir_name(name) for name in dirs]
 
     def add_package_binary(self, settings_value: Dict[str, str]) -> PackageBinaryFileBased:
         if set(settings_value.keys()) != set(self.settings_key):

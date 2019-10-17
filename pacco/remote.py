@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from typing import Dict, Optional
 
 from pacco.classes_file_based import PackageManagerFileBased
@@ -7,6 +8,8 @@ from pacco.clients import LocalClient, NexusFileClient, FileBasedClientAbstract
 
 
 class Remote:
+    package_manager: PackageManagerFileBased = None
+
     def __init__(self, name: str, remote_type: str, client: FileBasedClientAbstract):
         self.name = name
         self.remote_type = remote_type

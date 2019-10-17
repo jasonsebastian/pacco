@@ -26,7 +26,9 @@ class RemoteManager:
         >>> rm.add_remote('local_test', {'remote_type':'local'})
         >>> rm.list_remote()
         ['local_test']
-        >>> rm.add_remote('nexus', {'remote_type': 'nexus_site', 'url': 'http://localhost:8081/nexus/content/sites/pacco/', 'username': 'admin', 'password': 'admin123'})
+        >>> url = 'http://localhost:8081/nexus/content/sites/pacco/'
+        >>> nexus_conf = {'remote_type': 'nexus_site', 'url': url, 'username': 'admin', 'password': 'admin123'}
+        >>> rm.add_remote('nexus', nexus_conf)
         >>> sorted(rm.list_remote())
         ['local_test', 'nexus']
         >>> rm.set_default(['nexus', 'local_test'])
@@ -111,3 +113,54 @@ class RemoteManager:
             if remote not in self.remotes:
                 raise KeyError("Remote {} not exists".format(remote))
         self.default_remotes = remotes
+
+    def default_download(self, package_name: str, settings_value: Dict[str, str], dir_path: str) -> None:
+        """
+        Examples:
+            >>> import os
+            >>> __ = os.system("rm -f ~/.pacco_config")
+            >>> __ = os.system('rm -rf download_folder download_folder2 local3 pacco_storage tempfolder ~/.pacco')
+            >>> rm = RemoteManager()
+            >>> rm.add_remote('local', {'remote_type': 'local'})
+            >>> pm = rm.get_remote('local').package_manager
+            >>> pm.add_package_registry('openssl', ['os'])
+            PR[openssl, os]
+            >>> pr = pm.get_package_registry('openssl')
+            >>> pr.add_package_binary({'os': 'osx'})
+            PackageBinaryObject
+            >>> pb = pr.get_package_binary({'os': 'osx'})
+            >>> os.makedirs('tempfolder')
+            >>> open("tempfolder/testfile", "w").close()
+            >>> pb.upload_content('tempfolder')
+            >>> rm.add_remote('local2', {'remote_type': 'local', 'path': 'pacco_storage'})
+            >>> pm2 = rm.get_remote('local2').package_manager
+            >>> pm2.add_package_registry('openssl', ['os'])
+            PR[openssl, os]
+            >>> rm.add_remote('local3', {'remote_type': 'local', 'path': 'local3'})
+            >>> rm.set_default(['local2', 'local3', 'local'])
+            >>> rm.default_download('openssl', {'os': 'osx'}, 'download_folder')
+            >>> os.listdir('download_folder')
+            ['testfile']
+            >>> rm.set_default(['local', 'local3'])
+            >>> rm.default_download('openssl', {'os': 'osx'}, 'download_folder2')
+            >>> os.listdir('download_folder2')
+            ['testfile']
+            >>> rm.set_default(['local3'])
+            >>> rm.default_download('openssl', {'os': 'osx'}, 'download_folder3')
+            Traceback (most recent call last):
+            ...
+            FileNotFoundError: Such binary does not exist in any remotes in the default remote list
+            >>> __ = os.system('rm -rf download_folder download_folder2 local3 pacco_storage tempfolder ~/.pacco')
+        """
+        for remote_name in self.default_remotes:
+            remote = self.get_remote(remote_name)
+            if package_name in remote.package_manager.list_package_registries():
+                pr = remote.package_manager.get_package_registry(package_name)
+                try:
+                    pb = pr.get_package_binary(settings_value)
+                except (KeyError, FileNotFoundError):
+                    continue
+                else:
+                    pb.download_content(dir_path)
+                    return
+        raise FileNotFoundError("Such binary does not exist in any remotes in the default remote list")

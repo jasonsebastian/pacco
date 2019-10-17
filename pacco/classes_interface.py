@@ -13,12 +13,12 @@ class PackageManager:
     def __init__(self, client: ClientAbstract):
         self.client = client
 
-    def list_package_registries(self) -> List[Tuple[str, PackageRegistry]]:
+    def list_package_registries(self) -> List[str]:
         """
         List package registries in this package manager.
 
         Returns:
-            The list of package registry name and package registry object tuples
+            The list of package registry name
         """
         raise NotImplementedError()
 
@@ -69,12 +69,12 @@ class PackageRegistry:
         self.client = client
         self.settings_key = settings_key
 
-    def list_package_binaries(self) -> List[Tuple[Dict[str, str], PackageBinary]]:
+    def list_package_binaries(self) -> List[Dict[str, str]]:
         """
         List the package binaries registered in this package registry
 
         Returns:
-            list of tuples of the package binary settings_value dictionary and object
+            list of the package binary settings_value dictionaries
         """
         raise NotImplementedError()
 
