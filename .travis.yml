@@ -1,0 +1,8 @@
+deploy:
+  provider: pypi
+  user: "__token__"
+  password: $pypi_token
+  on:
+    tags: true
+    branch: master
+    skip_existing: true
