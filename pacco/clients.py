@@ -112,7 +112,7 @@ class LocalClient(FileBasedClientAbstract):
     def download_dir(self, download_path: str) -> None:
         for file_name in glob.iglob(os.path.join(self.__bin_dir, '**/*'), recursive=True):
             if os.path.isdir(file_name):
-                shutil.copytree(file_name, os.path.join(download_path, file_name))
+                shutil.copytree(file_name, os.path.join(download_path, os.path.relpath(file_name, self.__bin_dir)))
             else:
                 shutil.copy(file_name, os.path.join(download_path, os.path.relpath(file_name, self.__bin_dir)))
 
