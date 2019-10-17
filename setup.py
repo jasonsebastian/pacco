@@ -12,5 +12,9 @@ setup(
         'console_scripts': [
             'pacco=pacco.cli.entry_point:run'
         ]
-    }
+    },
+    install_requires=[
+        'requests',
+        'beautifulsoup4',
+    ]
 )
