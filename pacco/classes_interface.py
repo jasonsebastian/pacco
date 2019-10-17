@@ -69,16 +69,16 @@ class PackageRegistry:
         self.client = client
         self.settings_key = settings_key
 
-    def list_package_binaries(self) -> List[Tuple[str, PackageBinary]]:
+    def list_package_binaries(self) -> List[Tuple[Dict[str, str], PackageBinary]]:
         """
         List the package binaries registered in this package registry
 
         Returns:
-            list of tuples of the package binary name and object
+            list of tuples of the package binary settings_value dictionary and object
         """
         raise NotImplementedError()
 
-    def add_package_binary(self, settings_value: Dict[str, str]) -> Tuple[str, PackageBinary]:
+    def add_package_binary(self, settings_value: Dict[str, str]) -> PackageBinary:
         """
         Add a new package binary to this registry. Note that this will only declare the existance of the binary
         by creating a new directory, to upload the binary must be done through the ``PackageBinaryFileBased``
@@ -87,7 +87,7 @@ class PackageRegistry:
         Args:
             settings_value: the assignment of key value of the settings_key.
         Returns:
-            The tuple of the name of the directory name (serialized version of the configuration) and the object
+            The package binary object
         Exceptions:
             KeyError: raised if the set of keys in the passed ``settings_value`` is different with ``settings_key``
             FileExistsError: raised if a package binary with the same configuration already exist.
