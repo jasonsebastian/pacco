@@ -59,6 +59,9 @@ class PackageManagerFileBased(PackageManager):
             raise FileNotFoundError("The package registry {} is not found".format(name))
         return PackageRegistryFileBased(name, self.client.dispatch_subdir(name))
 
+    def __repr__(self):
+        return "PackageManagerObject"
+
 
 class PackageRegistryFileBased(PackageRegistry):
     """

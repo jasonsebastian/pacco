@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pacco',
-    version='0.1.9',
+    version='0.2.0',
     packages=find_packages(),
     author="Kevin Winata",
     author_email="kevinwinatamichael@gmail.com",
@@ -16,6 +16,7 @@ setup(
     install_requires=[
         'requests',
         'beautifulsoup4',
+        'PyYAML',
     ],
     python_requires='>=3.5',
 )
