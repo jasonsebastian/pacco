@@ -130,7 +130,7 @@ class Remote:
 
     def add(self, *args):
         """
-        Add remote.
+        Add a remote.
         """
         parser = argparse.ArgumentParser(prog="pacco remote add")
         parser.add_argument("name", help="remote name")
@@ -153,6 +153,15 @@ class Remote:
                 "username": username,
                 "password": password
             })
+
+    def remove(self, *args):
+        """
+        Remove a remote.
+        """
+        parser = argparse.ArgumentParser(prog="pacco remote remove")
+        parser.add_argument("name", help="remote name")
+        args = parser.parse_args(*args)
+        self.__rm.delete_remote(args.name)
 
 
 def main(args):
