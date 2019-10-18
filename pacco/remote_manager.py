@@ -21,30 +21,29 @@ class RemoteManager:
     Function to manage .pacco_config file as the storage for remote lists
 
     Example:
+        >>> open(os.path.join(str(Path.home()), ".pacco_config"), "w").close()
         >>> os.remove(os.path.join(str(Path.home()), ".pacco_config"))
         >>> rm = RemoteManager()
         >>> rm.add_remote('local_test', {'remote_type':'local'})
         >>> rm.list_remote()
         ['local_test']
-        >>> url = 'http://localhost:8081/nexus/content/sites/pacco/'
-        >>> nexus_conf = {'remote_type': 'nexus_site', 'url': url, 'username': 'admin', 'password': 'admin123'}
-        >>> rm.add_remote('nexus', nexus_conf)
+        >>> rm.add_remote('local_test_2', {'remote_type':'local', 'path': 'storage'})
         >>> sorted(rm.list_remote())
-        ['local_test', 'nexus']
-        >>> rm.set_default(['nexus', 'local_test'])
+        ['local_test', 'local_test_2']
+        >>> rm.set_default(['local_test_2', 'local_test'])
         >>> rm.get_default()
-        ['nexus', 'local_test']
+        ['local_test_2', 'local_test']
         >>> rm.delete_remote('local_test')
         Traceback (most recent call last):
         ...
         ValueError: The remote local_test is still in default remote, remove it first
-        >>> rm.set_default(['nexus'])
+        >>> rm.set_default(['local_test_2'])
         >>> rm.delete_remote('local_test')
         >>> del rm  # auto save
         >>> other_rm = RemoteManager()
         >>> other_rm.list_remote()
-        ['nexus']
-        >>> nexus_remote = other_rm.get_remote('nexus')
+        ['local_test_2']
+        >>> nexus_remote = other_rm.get_remote('local_test_2')
         >>> pm = nexus_remote.package_manager
         >>> pm
         PackageManagerObject
@@ -73,7 +72,7 @@ class RemoteManager:
 
     def save(self):
         serialized_remotes = {name: self.remotes[name].serialize() for name in self.remotes}
-        with open(self.__pacco_config, "x") as f:
+        with open(self.__pacco_config, "w") as f:
             yaml.dump({'remotes': serialized_remotes, 'default': self.default_remotes}, stream=f)
 
     @staticmethod

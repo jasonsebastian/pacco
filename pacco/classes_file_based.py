@@ -13,7 +13,7 @@ class PackageManagerFileBased(PackageManager):
 
     Examples:
         >>> from pacco.clients import LocalClient, NexusFileClient
-        >>> client = NexusFileClient('http://localhost:8081/nexus/content/sites/pacco/', 'admin', 'admin123', clean=True)
+        >>> client = LocalClient(clean=True)
         >>> pm = PackageManagerFileBased(client)
         >>> pm.list_package_registries()
         []
@@ -67,7 +67,7 @@ class PackageRegistryFileBased(PackageRegistry):
 
     Examples:
         >>> from pacco.clients import LocalClient, NexusFileClient
-        >>> client = NexusFileClient('http://localhost:8081/nexus/content/sites/pacco/', 'admin', 'admin123', clean=True)
+        >>> client = LocalClient(clean=True)
         >>> pm = PackageManagerFileBased(client)
         >>> pr = pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
         >>> pr.list_package_binaries()
@@ -173,7 +173,7 @@ class PackageBinaryFileBased(PackageBinary):
 
     Examples:
         >>> from pacco.clients import LocalClient, NexusFileClient
-        >>> client = NexusFileClient('http://localhost:8081/nexus/content/sites/pacco/', 'admin', 'admin123', clean=True)
+        >>> client = LocalClient(clean=True)
         >>> pm = PackageManagerFileBased(client)
         >>> pr = pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
         >>> pb = pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
