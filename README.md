@@ -2,6 +2,8 @@
 [![PyPi version](https://pypip.in/v/pacco/badge.png)](https://pypi.org/project/pacco/)
 
 # Pacco
+![](docs/source/_images/pacco.png)
+
 Pacco is a simple package manager (used for prebuilt binary) that is interoperable with Nexus repository manager.
 
 ## Usage
