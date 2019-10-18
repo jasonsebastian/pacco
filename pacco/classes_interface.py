@@ -31,15 +31,13 @@ class PackageManager:
         """
         raise NotImplementedError()
 
-    def add_package_registry(self, name: str, settings_key: List[str]) -> PackageRegistry:
+    def add_package_registry(self, name: str, settings_key: List[str]) -> None:
         """
         Add a new package registry to this package manager.
 
         Args:
             name: the name of the package. For printing purposes only.
             settings_key: the list of keys for the configuration parameter, e.g. ['os', 'compiler', 'version']
-        Returns:
-            The package registry object.
         Exception:
             FileExistsError: raised if the package with the same name is found
         """

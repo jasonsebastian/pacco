@@ -20,9 +20,7 @@ class PackageManagerFileBased(PackageManager):
         >>> pm.list_package_registries()
         []
         >>> pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
-        PR[openssl, compiler, os, version]
         >>> pm.add_package_registry('boost', ['os', 'target', 'type'])
-        PR[boost, os, target, type]
         >>> pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
         Traceback (most recent call last):
             ...
@@ -46,12 +44,13 @@ class PackageManagerFileBased(PackageManager):
     def delete_package_registry(self, name: str) -> None:
         self.client.rmdir(name)
 
-    def add_package_registry(self, name: str, settings_key: List[str]) -> PackageRegistryFileBased:
+    def add_package_registry(self, name: str, settings_key: List[str]) -> None:
         dirs = self.client.ls()
         if name in dirs:
             raise FileExistsError("The package registry {} is already found".format(name))
         self.client.mkdir(name)
-        return PackageRegistryFileBased(name, self.client.dispatch_subdir(name), settings_key)
+        PackageRegistryFileBased(name, self.client.dispatch_subdir(name), settings_key)
+        return
 
     def get_package_registry(self, name: str) -> PackageRegistryFileBased:
         dirs = self.client.ls()
@@ -72,7 +71,8 @@ class PackageRegistryFileBased(PackageRegistry):
         >>> client = LocalClient(clean=True)
         >>> if 'NEXUS_URL' in os.environ: client = NexusFileClient(os.environ['NEXUS_URL'], 'admin', 'admin123', clean=True)
         >>> pm = PackageManagerFileBased(client)
-        >>> pr = pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
+        >>> pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
+        >>> pr = pm.get_package_registry('openssl')
         >>> pr.list_package_binaries()
         []
         >>> pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
@@ -179,7 +179,8 @@ class PackageBinaryFileBased(PackageBinary):
         >>> client = LocalClient(clean=True)
         >>> if 'NEXUS_URL' in os.environ: client = NexusFileClient(os.environ['NEXUS_URL'], 'admin', 'admin123', clean=True)
         >>> pm = PackageManagerFileBased(client)
-        >>> pr = pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
+        >>> pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
+        >>> pr = pm.get_package_registry('openssl')
         >>> pb = pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
         >>> import os, shutil
         >>> os.makedirs('testfolder', exist_ok=True)

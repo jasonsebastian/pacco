@@ -192,7 +192,6 @@ class RemoteManager:
             >>> rm.add_remote('local', {'remote_type': 'local'})
             >>> pm = rm.get_remote('local')
             >>> pm.add_package_registry('openssl', ['os'])
-            PR[openssl, os]
             >>> pr = pm.get_package_registry('openssl')
             >>> pr.add_package_binary({'os': 'osx'})
             PackageBinaryObject
@@ -203,7 +202,6 @@ class RemoteManager:
             >>> rm.add_remote('local2', {'remote_type': 'local', 'path': 'pacco_storage'})
             >>> pm2 = rm.get_remote('local2')
             >>> pm2.add_package_registry('openssl', ['os'])
-            PR[openssl, os]
             >>> rm.add_remote('local3', {'remote_type': 'local', 'path': 'local3'})
             >>> rm.set_default(['local2', 'local3', 'local'])
             >>> rm.default_download('openssl', {'os': 'osx'}, 'download_folder')

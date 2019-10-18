@@ -13,4 +13,4 @@ To download a registry, run `pacco download <registry> <path> <settings_key=sett
 ## Install
 ```
 pip install pacco
-``
+```
