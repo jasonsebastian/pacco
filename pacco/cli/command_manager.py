@@ -279,6 +279,18 @@ class Registry:
         pm = self.__rm.get_remote(parsed_args.remote)
         pm.delete_package_registry(parsed_args.name)
 
+    def binaries(self, *args):
+        """
+        List binaries of a registry from a specific remote.
+        """
+        parser = argparse.ArgumentParser(prog="pacco registry delete")
+        parser.add_argument("remote", help="remote name")
+        parser.add_argument("name", help="registry name")
+        parsed_args = parser.parse_args(args)
+        pm = self.__rm.get_remote(parsed_args.remote)
+        pr = pm.get_package_registry(parsed_args.name)
+        self.__out.writeln(pr.list_package_binaries())
+
 
 def main(args):
     CommandManager().run(*args)
