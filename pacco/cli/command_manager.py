@@ -179,6 +179,15 @@ class Remote:
         args = parser.parse_args(args)
         self.__rm.set_default(args.name)
 
+    def print_default(self, *args):
+        """
+        Print default remote(s).
+        """
+        parser = argparse.ArgumentParser(prog="pacco remote print_default")
+        parser.parse_args(args)
+        default_remotes = self.__rm.get_default()
+        self.__out.writeln(default_remotes)
+
 
 def main(args):
     pacco_api = PaccoAPI()
