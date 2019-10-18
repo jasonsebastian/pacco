@@ -179,7 +179,8 @@ class PackageBinaryFileBased(PackageBinary):
         >>> pm = PackageManagerFileBased(client)
         >>> pm.add_package_registry('openssl', ['os', 'compiler', 'version'])
         >>> pr = pm.get_package_registry('openssl')
-        >>> pb = pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
+        >>> pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
+        >>> pb = pr.get_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
         >>> import os, shutil
         >>> os.makedirs('testfolder', exist_ok=True)
         >>> open('testfolder/testfile', 'w').close()
