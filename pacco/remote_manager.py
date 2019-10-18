@@ -46,9 +46,7 @@ class RemoteManager:
         >>> other_rm = RemoteManager()
         >>> other_rm.list_remote()
         ['local_test_2']
-        >>> nexus_remote = other_rm.get_remote('local_test_2')
-        >>> pm = nexus_remote.package_manager
-        >>> pm
+        >>> other_rm.get_remote('local_test_2')
         PackageManagerObject
     """
 
@@ -90,10 +88,10 @@ class RemoteManager:
                 serialized['remote_type'], ", ".join(['local', 'nexus_site'])
             ))
 
-    def get_remote(self, name: str) -> _Remote:
+    def get_remote(self, name: str) -> PackageManager:
         if name not in self.remotes:
             raise KeyError("The remote named {} is not found".format(name))
-        return self.remotes[name]
+        return self.remotes[name].package_manager
 
     def list_remote(self) -> List[str]:
         return list(self.remotes.keys())
@@ -125,7 +123,7 @@ class RemoteManager:
             >>> __ = os.system('rm -rf download_folder download_folder2 local3 pacco_storage tempfolder ~/.pacco')
             >>> rm = RemoteManager()
             >>> rm.add_remote('local', {'remote_type': 'local'})
-            >>> pm = rm.get_remote('local').package_manager
+            >>> pm = rm.get_remote('local')
             >>> pm.add_package_registry('openssl', ['os'])
             PR[openssl, os]
             >>> pr = pm.get_package_registry('openssl')
@@ -136,7 +134,7 @@ class RemoteManager:
             >>> open("tempfolder/testfile", "w").close()
             >>> pb.upload_content('tempfolder')
             >>> rm.add_remote('local2', {'remote_type': 'local', 'path': 'pacco_storage'})
-            >>> pm2 = rm.get_remote('local2').package_manager
+            >>> pm2 = rm.get_remote('local2')
             >>> pm2.add_package_registry('openssl', ['os'])
             PR[openssl, os]
             >>> rm.add_remote('local3', {'remote_type': 'local', 'path': 'local3'})
@@ -157,8 +155,8 @@ class RemoteManager:
         """
         for remote_name in self.default_remotes:
             remote = self.get_remote(remote_name)
-            if package_name in remote.package_manager.list_package_registries():
-                pr = remote.package_manager.get_package_registry(package_name)
+            if package_name in remote.list_package_registries():
+                pr = remote.get_package_registry(package_name)
                 try:
                     pb = pr.get_package_binary(settings_value)
                 except (KeyError, FileNotFoundError):
@@ -167,9 +165,6 @@ class RemoteManager:
                     pb.download_content(dir_path)
                     return
         raise FileNotFoundError("Such binary does not exist in any remotes in the default remote list")
-
-    def get_package_manager(self, remote_name: str) -> PackageManager:
-        return self.get_remote(remote_name).package_manager
 
 
 class _Remote:
