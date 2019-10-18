@@ -76,7 +76,7 @@ class PackageRegistry:
         """
         raise NotImplementedError()
 
-    def add_package_binary(self, settings_value: Dict[str, str]) -> PackageBinary:
+    def add_package_binary(self, settings_value: Dict[str, str]) -> None:
         """
         Add a new package binary to this registry. Note that this will only declare the existance of the binary
         by creating a new directory, to upload the binary must be done through the ``PackageBinaryFileBased``
@@ -84,8 +84,6 @@ class PackageRegistry:
 
         Args:
             settings_value: the assignment of key value of the settings_key.
-        Returns:
-            The package binary object
         Exceptions:
             KeyError: raised if the set of keys in the passed ``settings_value`` is different with ``settings_key``
             FileExistsError: raised if a package binary with the same configuration already exist.

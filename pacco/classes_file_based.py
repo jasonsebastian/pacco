@@ -76,7 +76,6 @@ class PackageRegistryFileBased(PackageRegistry):
         >>> pr.list_package_binaries()
         []
         >>> pr.add_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
-        PackageBinaryObject
         >>> pr.add_package_binary({'host_os':'osx', 'compiler':'clang', 'version':'1.0'})
         Traceback (most recent call last):
             ...
@@ -88,7 +87,6 @@ class PackageRegistryFileBased(PackageRegistry):
         >>> len(pr.list_package_binaries())
         1
         >>> pr.add_package_binary({'os':'linux', 'compiler':'gcc', 'version':'1.0'})
-        PackageBinaryObject
         >>> len(pr.list_package_binaries())
         2
         >>> pr.delete_package_binary({'os':'osx', 'compiler':'clang', 'version':'1.0'})
@@ -146,7 +144,7 @@ class PackageRegistryFileBased(PackageRegistry):
         dirs.remove(self.__generate_settings_key_dir_name(self.settings_key))
         return [PackageRegistryFileBased.__generate_settings_value_from_dir_name(name) for name in dirs]
 
-    def add_package_binary(self, settings_value: Dict[str, str]) -> PackageBinaryFileBased:
+    def add_package_binary(self, settings_value: Dict[str, str]) -> None:
         if set(settings_value.keys()) != set(self.settings_key):
             raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
                                                                      sorted(self.settings_key)))
@@ -154,7 +152,7 @@ class PackageRegistryFileBased(PackageRegistry):
         if dir_name in self.client.ls():
             raise FileExistsError("such binary already exist")
         self.client.mkdir(dir_name)
-        return PackageBinaryFileBased(self.client.dispatch_subdir(dir_name))
+        return
 
     def delete_package_binary(self, settings_value: Dict[str, str]):
         dir_name = PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)

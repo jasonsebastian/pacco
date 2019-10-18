@@ -194,7 +194,6 @@ class RemoteManager:
             >>> pm.add_package_registry('openssl', ['os'])
             >>> pr = pm.get_package_registry('openssl')
             >>> pr.add_package_binary({'os': 'osx'})
-            PackageBinaryObject
             >>> pb = pr.get_package_binary({'os': 'osx'})
             >>> os.makedirs('tempfolder')
             >>> open("tempfolder/testfile", "w").close()
