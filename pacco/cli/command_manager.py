@@ -175,7 +175,7 @@ class Remote:
 
     def set_default(self, *args):
         """
-        Set default remote.
+        Set default remote(s).
         """
         parser = argparse.ArgumentParser(prog="pacco remote set_default")
         parser.add_argument("name", nargs="*", help="remote name")
@@ -267,6 +267,17 @@ class Registry:
             raise ValueError("Settings must be in the form of ([(\\w)-.]+,)*([(\\w)-.]+),?")
         pm = self.__rm.get_remote(parsed_args.remote)
         pm.add_package_registry(parsed_args.name, parsed_args.settings.split(","))
+
+    def delete(self, *args):
+        """
+        Delete a registry from a specific remote.
+        """
+        parser = argparse.ArgumentParser(prog="pacco registry delete")
+        parser.add_argument("remote", help="remote name")
+        parser.add_argument("name", help="registry name")
+        parsed_args = parser.parse_args(args)
+        pm = self.__rm.get_remote(parsed_args.remote)
+        pm.delete_package_registry(parsed_args.name)
 
 
 def main(args):
