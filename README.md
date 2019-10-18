@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/kwinata/pacco.svg?branch=master)](https://travis-ci.org/kwinata/pacco)
+
 # pacco
 Pacco is a simple package manager (used for prebuilt binary) that is interoperable with Nexus repository manager.
 
