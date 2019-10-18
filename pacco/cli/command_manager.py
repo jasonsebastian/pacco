@@ -1,15 +1,16 @@
 import argparse
 import inspect
+import re
 from typing import Callable, Dict
 
-from pacco.cli.pacco_api import PaccoAPI
+from pacco.cli.output_stream import OutputStream
 from pacco.remote_manager import RemoteManager, ALLOWED_REMOTE_TYPES
 
 
 class CommandManager:
-    def __init__(self, pacco_api):
-        self.__pacco = pacco_api
-        self.__out = pacco_api.out
+    def __init__(self):
+        self.__out = OutputStream()
+        self.__rm = RemoteManager()
 
     def run(self, *args):
         """
@@ -56,26 +57,17 @@ class CommandManager:
         self.__out.writeln("")
         self.__out.writeln("Pacco commands. Type 'pacco <command> -h' for help")
 
-    def download(self, *args: str):
-        """
-        Download binary by specifying registry, path and settings.
-        """
-        parser = argparse.ArgumentParser(prog="pacco download")
-        parser.add_argument("registry", help="which registry to download")
-        parser.add_argument("path", help="path to download registry")
-        parser.add_argument("settings", nargs="+", help="settings for the specified registry")
-        args = parser.parse_args(args)
-        self.__pacco.download(args.registry, args.path, *args.settings)
-
     def remote(self, *args: str):
-        Remote(self.__pacco).run(*args)
+        Remote(self.__out, self.__rm).run(*args)
+
+    def binary(self, *args: str):
+        Binary(self.__out, self.__rm).run(*args)
 
 
 class Remote:
-    def __init__(self, pacco_api):
-        self.__pacco = pacco_api
-        self.__out = pacco_api.out
-        self.__rm = RemoteManager()
+    def __init__(self, output, remote_manager):
+        self.__out = output
+        self.__rm = remote_manager
 
     def run(self, *args):
         """
@@ -189,6 +181,75 @@ class Remote:
         self.__out.writeln(default_remotes)
 
 
+class Binary:
+    def __init__(self, output, remote_manager: RemoteManager):
+        self.__out = output
+        self.__rm = remote_manager
+
+    @staticmethod
+    def __parse_settings_args(settings_args: str) -> Dict[str, str]:
+        if not re.match(r"([\w-.]+=[\w-.]+,)*([\w-.]+=[\w-.]+),?", settings_args):
+            raise ValueError("The settings configuration must match ([\\w-.]+=[\\w-.]+,)*([\\w-.]+=[\\w-.]+),?")
+        return {token.split('=')[0]: token.split('=')[1] for token in settings_args.split('=')}
+
+    def download(self, *args):
+        parser = argparse.ArgumentParser(prog="pacco binary download")
+        parser.parse_args()
+        parser.add_argument("remote_name", help="remote name")
+        parser.add_argument("registry_name", help="registry name")
+        parser.add_argument("dir_path", help="download path")
+        parser.add_argument("settings", help="settings for the specified registry "
+                                             "(e.g. os=linux;version=2.1.0;type=debug")
+
+        parsed_args = parser.parse_args(args)
+
+        settings_dict = Binary.__parse_settings_args(parsed_args.settings)
+
+        if parsed_args.remote_name == 'default':
+            self.__rm.default_download(parsed_args.registry_name, settings_dict, parsed_args.dir_path)
+        pm = self.__rm.get_remote(parsed_args.remote_name)
+        pr = pm.get_package_registry(parsed_args.registry_name)
+        pb = pr.get_package_binary(settings_dict)
+        pb.download_content(parsed_args.dir_path)
+
+    def upload(self, *args):
+        parser = argparse.ArgumentParser(prog="pacco binary upload")
+        parser.parse_args()
+        parser.add_argument("remote_name", help="remote name")
+        parser.add_argument("registry_name", help="registry name")
+        parser.add_argument("dir_path", help="directory to be uploaded")
+        parser.add_argument("settings", help="settings for the specified registry "
+                                             "(e.g. os=linux;version=2.1.0;type=debug")
+
+        parsed_args = parser.parse_args(args)
+
+        settings_value = Binary.__parse_settings_args(parsed_args.settings)
+        pm = self.__rm.get_remote(parsed_args.remote_name)
+        pr = pm.get_package_registry(parsed_args.registry_name)
+        try:
+            pb = pr.get_package_binary(settings_value)
+        except FileNotFoundError as e:
+            pr.add_package_binary(settings_value)
+        else:
+            self.__out.writeln("WARNING: Existing binary found, overwriting")
+        finally:
+            pb = pr.get_package_binary(settings_value)
+            pb.upload_content(parsed_args.dir_path)
+
+    def delete(self, *args):
+        parser = argparse.ArgumentParser(prog="pacco binary delete")
+        parser.parse_args()
+        parser.add_argument("remote_name", help="remote name")
+        parser.add_argument("registry_name", help="registry name")
+        parser.add_argument("settings", help="settings for the specified registry "
+                                             "(e.g. os=linux;version=2.1.0;type=debug")
+        parsed_args = parser.parse_args(args)
+
+        settings_value = Binary.__parse_settings_args(parsed_args.settings)
+        pm = self.__rm.get_remote(parsed_args.remote_name)
+        pr = pm.get_package_registry(parsed_args.registry_name)
+        pr.delete_package_binary(settings_value)
+
+
 def main(args):
-    pacco_api = PaccoAPI()
-    CommandManager(pacco_api).run(*args)
+    CommandManager().run(*args)
