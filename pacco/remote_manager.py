@@ -21,9 +21,10 @@ DEFAULT_REMOTE_NAME = 'default'
 
 class RemoteManager:
     """
-    Function to manage .pacco_config file as the storage for remote lists
+    Function to manage ``.pacco_config`` file as the storage for remote lists
+    With ``RemoteManager``, you can manage multiple ``PackageManager`` s
 
-    Example:
+    Examples:
         >>> open(os.path.join(str(Path.home()), ".pacco_config"), "w").close()
         >>> os.remove(os.path.join(str(Path.home()), ".pacco_config"))
         >>> rm = RemoteManager()
@@ -123,6 +124,7 @@ class RemoteManager:
             }
 
         Nexus site client: ::
+
             {
                 'remote_type': 'nexus_site',
                 'url': '[URL]',
