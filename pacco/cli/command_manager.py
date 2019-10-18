@@ -3,7 +3,7 @@ import inspect
 from typing import Callable, Dict
 
 from pacco.cli.pacco_api import PaccoAPI
-from pacco.remote_manager import RemoteManager
+from pacco.remote_manager import RemoteManager, ALLOWED_REMOTE_TYPES
 
 
 class CommandManager:
@@ -127,6 +127,32 @@ class Remote:
             self.__out.writeln("No registered remotes")
         else:
             self.__out.writeln(remotes)
+
+    def add(self, *args):
+        """
+        Add remote.
+        """
+        parser = argparse.ArgumentParser(prog="pacco remote add")
+        parser.add_argument("name", help="remote name")
+        parser.add_argument("type", help="remote type", choices=ALLOWED_REMOTE_TYPES)
+        args = parser.parse_args(*args)
+        if args.type == "local":
+            path = input("Path (if empty, ~/.pacco/ will be used): ")
+            self.__rm.add_remote(args.name, {
+                "remote_type": "local",
+                "path": path
+            })
+        elif args.type == "nexus_site":
+            url = input("URL: ")
+            username = input("Username: ")
+            from getpass import getpass
+            password = getpass()
+            self.__rm.add_remote(args.name, {
+                "remote_type": "nexus_site",
+                "url": url,
+                "username": username,
+                "password": password
+            })
 
 
 def main(args):
