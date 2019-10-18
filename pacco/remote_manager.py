@@ -72,7 +72,11 @@ class RemoteManager:
     def __del__(self):
         self.save()
 
-    def save(self):
+    def save(self) -> None:
+        """
+        Save the current state to ".pacco_config", this will also be done in the ``__del__``
+        method, such that even if you forget to save, it will be auto saved when the program closes.
+        """
         serialized_remotes = {name: self.remotes[name].serialize() for name in self.remotes}
         with open(self.__pacco_config, "w") as f:
             yaml.dump({'remotes': serialized_remotes, 'default': self.default_remotes}, stream=f)
@@ -89,34 +93,93 @@ class RemoteManager:
             ))
 
     def get_remote(self, name: str) -> PackageManager:
+        """
+        Get the ``PackageManager`` based on the remote name.
+
+        Args:
+            name: the name of the remote
+        Return:
+            the package manager object
+        """
         if name not in self.remotes:
             raise KeyError("The remote named {} is not found".format(name))
         return self.remotes[name].package_manager
 
     def list_remote(self) -> List[str]:
+        """
+        Get the list of the remote names
+        """
         return list(self.remotes.keys())
 
     def add_remote(self, name: str, configuration: Dict[str, str]) -> None:
+        """
+        Add/register a new remote. Currently there is two possible configuration:
+
+        Local client: ::
+
+            {
+                'remote_type': 'local',
+                'path': '[PATH]', (optional, will use ~/.pacco/ if not declared)
+            }
+
+        Nexus site client: ::
+            {
+                'remote_type': 'nexus_site',
+                'url': '[URL]',
+                'username': '[USERNAME]',
+                'password': '[PASSWORD]',
+            }
+
+        Args:
+            name: the name of the new remote
+            configuration: a dictionary of the configuration as described above.
+        """
         if name in self.list_remote():
             raise NameError("The remote with name {} already exists".format(name))
         self.remotes[name] = RemoteManager.__instantiate_remote(name, configuration)
 
     def delete_remote(self, name: str) -> None:
+        """
+        Deregister a remote from this remote manager.
+
+        Args:
+            name: the name of the remote to be deregistered
+        """
         if name in self.default_remotes:
             raise ValueError("The remote {} is still in default remote, remove it first".format(name))
         del self.remotes[name]
 
     def get_default(self) -> List[str]:
+        """
+        Get the list of the default remotes to be used in the default download
+
+        Returns:
+            the list of remotes in order to be tried. (index 0 will be tried first)
+        """
         return list(self.default_remotes)
 
     def set_default(self, remotes: List[str]) -> None:
+        """
+        Set the default remote list as the "try list" for the default download
+
+        Args:
+            remotes: list of the remote names
+        Exception:
+            KeyError: when the Remote name does not exists
+        """
         for remote in remotes:
             if remote not in self.remotes:
-                raise KeyError("_Remote {} not exists".format(remote))
+                raise KeyError("remote {} not exists".format(remote))
         self.default_remotes = remotes
 
     def default_download(self, package_name: str, settings_value: Dict[str, str], dir_path: str) -> None:
         """
+        Try to download a package binary from the remotes in the default remote list.
+
+        Args:
+            package_name: package registry name of the binary
+            settings_value: the dictionary of the binary configuration
+            dir_path: the download destination
         Examples:
             >>> import os
             >>> __ = os.system("rm -f ~/.pacco_config")
