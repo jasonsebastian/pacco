@@ -3,6 +3,7 @@ import inspect
 import re
 from typing import Callable, Dict
 
+from pacco import __version__ as client_version
 from pacco.cli.output_stream import OutputStream
 from pacco.remote_manager import RemoteManager, ALLOWED_REMOTE_TYPES
 
@@ -25,6 +26,9 @@ class CommandManager:
         if command not in commands:
             if command in ["-h", "--help"]:
                 self.__show_help()
+                return
+            elif command in ["-v", "--version"]:
+                self.__out.writeln("Pacco version {}".format(client_version))
                 return
             self.__out.writeln("'pacco {}' is an invalid command. See 'pacco --help'.".format(command), error=True)
             return
@@ -59,10 +63,10 @@ class CommandManager:
 
     def remote(self, *args: str):
         Remote(self.__out, self.__rm).run(*args)
-  
+
     def registry(self, *args: str):
         Registry(self.__out, self.__rm).run(*args)
-        
+
     def binary(self, *args: str):
         Binary(self.__out, self.__rm).run(*args)
 
@@ -352,6 +356,7 @@ class Binary:
         pm = self.__rm.get_remote(parsed_args.remote_name)
         pr = pm.get_package_registry(parsed_args.registry_name)
         pr.delete_package_binary(settings_value)
+
 
 def main(args):
     CommandManager().run(*args)
