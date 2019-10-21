@@ -8,6 +8,7 @@ script:
   - git clone https://github.com/sstephenson/bats.git
   - ./bats/install.sh bats_installation
   - export PATH=$PATH:$PWD/bats_installation
+  - pip install .
   - bats tests/cli.bats
 
 deploy:
