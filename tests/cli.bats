@@ -86,8 +86,8 @@
   mkdir openssl_upload_dir && touch openssl_upload_dir/sample.a
   pacco binary upload local openssl openssl_upload_dir os=android,version=2.1.0,obfuscation=obfuscated
   pacco binary download local openssl openssl_download_dir os=android,version=2.1.0,obfuscation=obfuscated
-  result="$(ls openssl_download_dir | grep sample.a)"
-  [ -n "${result}" ]
+  result="$(ls openssl_download_dir)"
+  [ "${result}" == "sample.a" ]
   pacco binary remove local openssl os=android,version=2.1.0,obfuscation=obfuscated
   rm -rf openssl_download_dir openssl_upload_dir
   pacco registry remove local openssl
