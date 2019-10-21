@@ -5,6 +5,10 @@ python:
 script:
   - python -m doctest pacco/classes_file_based.py -f
   - python -m doctest pacco/remote_manager.py -f
+  - git clone https://github.com/sstephenson/bats.git
+  - ./bats/install.sh bats_installation
+  - export PATH=$PATH:$PWD/bats_installation
+  - bats tests/cli.bats
 
 deploy:
   provider: script
