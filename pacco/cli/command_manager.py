@@ -369,17 +369,17 @@ class Binary:
                                              "(e.g. os=linux,version=2.1.0,type=debug")
         parsed_args = parser.parse_args(args)
 
-        assignments = Binary.__parse_settings_args(parsed_args.settings)
+        assignment = Binary.__parse_settings_args(parsed_args.settings)
         pm = self.__rm.get_remote(parsed_args.remote_name)
         pr = pm.get_package_registry(parsed_args.registry_name)
         try:
-            pr.get_package_binary(assignments)
+            pr.get_package_binary(assignment)
         except FileNotFoundError:
-            pr.add_package_binary(assignments)
+            pr.add_package_binary(assignment)
         else:
             self.__out.writeln("WARNING: Existing binary found, overwriting")
         finally:
-            pb = pr.get_package_binary(assignments)
+            pb = pr.get_package_binary(assignment)
             pb.upload_content(parsed_args.dir_path)
 
     def remove(self, *args):
@@ -390,10 +390,10 @@ class Binary:
                                              "(e.g. os=linux,version=2.1.0,type=debug")
         parsed_args = parser.parse_args(args)
 
-        assignments = Binary.__parse_settings_args(parsed_args.settings)
+        assignment = Binary.__parse_settings_args(parsed_args.settings)
         pm = self.__rm.get_remote(parsed_args.remote_name)
         pr = pm.get_package_registry(parsed_args.registry_name)
-        pr.remove_package_binary(assignments)
+        pr.remove_package_binary(assignment)
 
 
 def main(args):

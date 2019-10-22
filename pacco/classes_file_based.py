@@ -64,7 +64,7 @@ class PackageManagerFileBased(PackageManager):
         return "PackageManagerObject"
 
 
-#TODO: assignment seems to be more appropriate than assignments
+#TODO: assignment seems to be more appropriate than assignment
 class PackageRegistryFileBased(PackageRegistry):
     """
     An implementation of the PackageRegistry interface
@@ -133,18 +133,18 @@ class PackageRegistryFileBased(PackageRegistry):
         return '=='.join([PackageRegistryFileBased.__params_prefix] + params)
 
     @staticmethod
-    def __serialize_assignments(assignments: Dict[str, str]) -> str:
-        sorted_assignments_tuple = sorted(assignments.items(), key=lambda x: x[0])
-        zipped_assignments = ['='.join(pair) for pair in sorted_assignments_tuple]
-        return '=='.join(zipped_assignments)
+    def __serialize_assignment(assignment: Dict[str, str]) -> str:
+        sorted_assignment_tuple = sorted(assignment.items(), key=lambda x: x[0])
+        zipped_assignment = ['='.join(pair) for pair in sorted_assignment_tuple]
+        return '=='.join(zipped_assignment)
 
     @staticmethod
-    def __unserialize_assignments(dir_name: str) -> Dict[str, str]:
+    def __unserialize_assignment(dir_name: str) -> Dict[str, str]:
         if not re.match(r"((\w+=\w+)==)*(\w+=\w+)", dir_name):
             raise ValueError("Invalid dir_name syntax {}".format(dir_name))
         return {arg.split('=')[0]: arg.split('=')[1] for arg in dir_name.split('==')}
 
-    def __get_serialized_assignments_to_wrapper_mapping(self):
+    def __get_serialized_assignment_to_wrapper_mapping(self):
         dir_names = self.client.ls()
         dir_names.remove(self.__serialize_params(self.params))
 
@@ -153,27 +153,27 @@ class PackageRegistryFileBased(PackageRegistry):
             sub_dirs = self.client.dispatch_subdir(dir_name).ls()
             if 'bin' in sub_dirs:
                 sub_dirs.remove('bin')
-            serialized_assignments = sub_dirs[0]
-            mapping[serialized_assignments] = dir_name
+            serialized_assignment = sub_dirs[0]
+            mapping[serialized_assignment] = dir_name
 
         return mapping
 
     def list_package_binaries(self) -> List[Dict[str, str]]:
-        return [PackageRegistryFileBased.__unserialize_assignments(serialized_assignments)
-                for serialized_assignments in self.__get_serialized_assignments_to_wrapper_mapping()]
+        return [PackageRegistryFileBased.__unserialize_assignment(serialized_assignment)
+                for serialized_assignment in self.__get_serialized_assignment_to_wrapper_mapping()]
 
     @staticmethod
     def __random_string(length: int) -> str:
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
-    def add_package_binary(self, assignments: Dict[str, str]) -> None:
-        if set(assignments.keys()) != set(self.params):
-            raise KeyError("wrong settings key: {} is not {}".format(sorted(assignments.keys()),
+    def add_package_binary(self, assignment: Dict[str, str]) -> None:
+        if set(assignment.keys()) != set(self.params):
+            raise KeyError("wrong settings key: {} is not {}".format(sorted(assignment.keys()),
                                                                      sorted(self.params)))
 
-        serialized_assignments = PackageRegistryFileBased.__serialize_assignments(assignments)
-        mapping = self.__get_serialized_assignments_to_wrapper_mapping()
-        if serialized_assignments in mapping:
+        serialized_assignment = PackageRegistryFileBased.__serialize_assignment(assignment)
+        mapping = self.__get_serialized_assignment_to_wrapper_mapping()
+        if serialized_assignment in mapping:
             raise FileExistsError("such binary already exist")
 
         new_random_dir_name = PackageRegistryFileBased.__random_string(10)
@@ -181,24 +181,24 @@ class PackageRegistryFileBased(PackageRegistry):
             new_random_dir_name = PackageRegistryFileBased.__random_string(10)
 
         self.client.mkdir(new_random_dir_name)
-        self.client.dispatch_subdir(new_random_dir_name).mkdir(serialized_assignments)
+        self.client.dispatch_subdir(new_random_dir_name).mkdir(serialized_assignment)
         return
 
-    def remove_package_binary(self, assignments: Dict[str, str]):
-        self.client.rmdir(self.__get_serialized_assignments_to_wrapper_mapping()[
-                              PackageRegistryFileBased.__serialize_assignments(assignments)
+    def remove_package_binary(self, assignment: Dict[str, str]):
+        self.client.rmdir(self.__get_serialized_assignment_to_wrapper_mapping()[
+                              PackageRegistryFileBased.__serialize_assignment(assignment)
                           ])
 
-    def get_package_binary(self, assignments: Dict[str, str]) -> PackageBinaryFileBased:
-        serialized_assignments = PackageRegistryFileBased.__serialize_assignments(assignments)
-        if set(assignments.keys()) != set(self.params):
-            raise KeyError("wrong settings key: {} is not {}".format(sorted(assignments.keys()),
+    def get_package_binary(self, assignment: Dict[str, str]) -> PackageBinaryFileBased:
+        serialized_assignment = PackageRegistryFileBased.__serialize_assignment(assignment)
+        if set(assignment.keys()) != set(self.params):
+            raise KeyError("wrong settings key: {} is not {}".format(sorted(assignment.keys()),
                                                                      sorted(self.params)))
-        if serialized_assignments not in self.__get_serialized_assignments_to_wrapper_mapping():
+        if serialized_assignment not in self.__get_serialized_assignment_to_wrapper_mapping():
             raise FileNotFoundError("such configuration does not exist")
         return PackageBinaryFileBased(
             self.client.dispatch_subdir(
-                self.__get_serialized_assignments_to_wrapper_mapping()[serialized_assignments]
+                self.__get_serialized_assignment_to_wrapper_mapping()[serialized_assignment]
             )
         )
 

@@ -72,39 +72,39 @@ class PackageRegistry:
         List the package binaries registered in this package registry
 
         Returns:
-            list of the package binary assignments dictionaries
+            list of the package binary assignment dictionaries
         """
         raise NotImplementedError()
 
-    def add_package_binary(self, assignments: Dict[str, str]) -> None:
+    def add_package_binary(self, assignment: Dict[str, str]) -> None:
         """
         Add a new package binary to this registry. Note that this will only declare the existance of the binary
         by creating a new directory, to upload the binary must be done through the ``PackageBinaryFileBased``
         object itself.
 
         Args:
-            assignments: the assignment of key value of the params.
+            assignment: the assignment of key value of the params.
         Exceptions:
-            KeyError: raised if the set of keys in the passed ``assignments`` is different with ``params``
+            KeyError: raised if the set of keys in the passed ``assignment`` is different with ``params``
             FileExistsError: raised if a package binary with the same configuration already exist.
         """
         raise NotImplementedError()
 
-    def remove_package_binary(self, assignments: Dict[str, str]):
+    def remove_package_binary(self, assignment: Dict[str, str]):
         """
         Delete the package binary folder
 
         Args:
-            assignments: the configuration of the the package binary to be deleted
+            assignment: the configuration of the the package binary to be deleted
         """
         raise NotImplementedError()
 
-    def get_package_binary(self, assignments: Dict[str, str]) -> PackageBinary:
+    def get_package_binary(self, assignment: Dict[str, str]) -> PackageBinary:
         """
         Get a reference to the ``PackageBinary`` object based on the settings value
 
         Args:
-            assignments: the configuration of the the package binary to get
+            assignment: the configuration of the the package binary to get
         Returns:
             the object
         Exceptions:
