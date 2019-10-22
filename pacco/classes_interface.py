@@ -31,13 +31,13 @@ class PackageManager:
         """
         raise NotImplementedError()
 
-    def add_package_registry(self, name: str, settings_key: List[str]) -> None:
+    def add_package_registry(self, name: str, params: List[str]) -> None:
         """
         Add a new package registry to this package manager.
 
         Args:
             name: the name of the package. For printing purposes only.
-            settings_key: the list of keys for the configuration parameter, e.g. ['os', 'compiler', 'version']
+            params: the list of keys for the configuration parameter, e.g. ['os', 'compiler', 'version']
         Exception:
             FileExistsError: raised if the package with the same name is found
         """
@@ -57,7 +57,6 @@ class PackageManager:
         raise NotImplementedError()
 
 
-# TODO: do rename settings_value and settings_key also here
 class PackageRegistry:
     """
     Represent the existence of a package (e.g. openssl) in the package manager.
@@ -73,39 +72,39 @@ class PackageRegistry:
         List the package binaries registered in this package registry
 
         Returns:
-            list of the package binary settings_value dictionaries
+            list of the package binary assignments dictionaries
         """
         raise NotImplementedError()
 
-    def add_package_binary(self, settings_value: Dict[str, str]) -> None:
+    def add_package_binary(self, assignments: Dict[str, str]) -> None:
         """
         Add a new package binary to this registry. Note that this will only declare the existance of the binary
         by creating a new directory, to upload the binary must be done through the ``PackageBinaryFileBased``
         object itself.
 
         Args:
-            settings_value: the assignment of key value of the settings_key.
+            assignments: the assignment of key value of the params.
         Exceptions:
-            KeyError: raised if the set of keys in the passed ``settings_value`` is different with ``settings_key``
+            KeyError: raised if the set of keys in the passed ``assignments`` is different with ``params``
             FileExistsError: raised if a package binary with the same configuration already exist.
         """
         raise NotImplementedError()
 
-    def remove_package_binary(self, settings_value: Dict[str, str]):
+    def remove_package_binary(self, assignments: Dict[str, str]):
         """
         Delete the package binary folder
 
         Args:
-            settings_value: the configuration of the the package binary to be deleted
+            assignments: the configuration of the the package binary to be deleted
         """
         raise NotImplementedError()
 
-    def get_package_binary(self, settings_value: Dict[str, str]) -> PackageBinary:
+    def get_package_binary(self, assignments: Dict[str, str]) -> PackageBinary:
         """
         Get a reference to the ``PackageBinary`` object based on the settings value
 
         Args:
-            settings_value: the configuration of the the package binary to get
+            assignments: the configuration of the the package binary to get
         Returns:
             the object
         Exceptions:

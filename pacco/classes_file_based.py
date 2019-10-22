@@ -46,12 +46,12 @@ class PackageManagerFileBased(PackageManager):
     def remove_package_registry(self, name: str) -> None:
         self.client.rmdir(name)
 
-    def add_package_registry(self, name: str, settings_key: List[str]) -> None:
+    def add_package_registry(self, name: str, params: List[str]) -> None:
         dirs = self.client.ls()
         if name in dirs:
             raise FileExistsError("The package registry {} is already found".format(name))
         self.client.mkdir(name)
-        PackageRegistryFileBased(name, self.client.dispatch_subdir(name), settings_key)
+        PackageRegistryFileBased(name, self.client.dispatch_subdir(name), params)
         return
 
     def get_package_registry(self, name: str) -> PackageRegistryFileBased:
