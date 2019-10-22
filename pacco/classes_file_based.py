@@ -100,7 +100,7 @@ class PackageRegistryFileBased(PackageRegistry):
         >>> pr.delete_param('compiler')
         Traceback (most recent call last):
         ...
-        ValueError: Cannot remove parameter compiler since it will cause two binary to have the same value
+        NameError: Cannot remove parameter compiler since it will cause two binary to have the same value
         >>> pr.append_param('stdlib', default_value='c++11')
         >>> pr
         PR[openssl, compiler, os, stdlib, version]
