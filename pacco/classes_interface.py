@@ -113,6 +113,45 @@ class PackageRegistry:
         """
         raise NotImplementedError()
 
+    def append_param(self, name: str, default_value: Optional[str] = "default") -> None:
+        """
+        Append new parameter to each ``PackageBinary`` object and assign ``default_value`` as
+        the default value to the new parameter
+
+        Args:
+            name: the new param name
+            default_value: the default value to be assigned
+        Exceptions:
+            ValueError: if the param is already exist
+        """
+        raise NotImplementedError()
+
+    def delete_param(self, name: str) -> None:
+        """
+        Remove a parameter from each ``PackageBinary`` object
+
+        Args:
+            name: the param name to be deleted
+        Exceptions:
+            ValueError: if the param name does not exist
+            NameError: if the resulting assignments will have duplicate when the param is removed
+        """
+        raise NotImplementedError()
+
+    def reassign_binary(self, old_assignment: Dict[str, str], new_assignment: Dict[str, str]) -> None:
+        """
+        Reassign a new assignment to an existing binary
+
+        Args:
+            old_assignment: the old assignment
+            new_assignment: the new assignment
+        Exceptions:
+            KeyError: if the key in the new assignment does not match with params
+            ValueError: if there is no binary that match old_assignment
+            NameError: there already exist binary with the same configuration as new_assignment
+        """
+        raise NotImplementedError()
+
 
 class PackageBinary:
     """

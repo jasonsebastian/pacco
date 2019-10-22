@@ -248,7 +248,7 @@ class PackageRegistryFileBased(PackageRegistry):
             del assignment[name]
             new_serialized_assignment = PackageRegistryFileBased.__serialize_assignment(assignment)
             if new_serialized_assignment in new_set_of_serialized_assignment:
-                raise ValueError("Cannot remove parameter {} since it will cause "
+                raise NameError("Cannot remove parameter {} since it will cause "
                                  "two binary to have the same value".format(name))
             else:
                 new_set_of_serialized_assignment.add(new_serialized_assignment)
@@ -270,7 +270,7 @@ class PackageRegistryFileBased(PackageRegistry):
         if serialized_old_assignment not in mapping:
             raise ValueError("there is no binary that match the assignment")
         if serialized_new_assignment in mapping:
-            raise ValueError("there already exist binary with same assignment with the new one")
+            raise NameError("there already exist binary with same assignment with the new one")
 
         sub_client = self.client.dispatch_subdir(mapping[serialized_old_assignment])
         sub_client.rmdir(serialized_old_assignment)
