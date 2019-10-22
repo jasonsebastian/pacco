@@ -35,6 +35,7 @@ class PackageManagerFileBased(PackageManager):
         >>> pm.get_package_registry('boost')
         PR[boost, os, target, type]
     """
+
     def __init__(self, client: FileBasedClientAbstract):
         if not isinstance(client, FileBasedClientAbstract):
             raise TypeError("Must be using FileBasedClient")
@@ -97,17 +98,17 @@ class PackageRegistryFileBased(PackageRegistry):
         >>> pr.get_package_binary({'os':'linux', 'compiler':'gcc', 'version':'1.0'})
         PackageBinaryObject
         >>> pr.add_package_binary({'os':'linux', 'compiler':'g++', 'version':'1.0'})
-        >>> pr.delete_param('compiler')
+        >>> pr.param_remove('compiler')
         Traceback (most recent call last):
         ...
         NameError: Cannot remove parameter compiler since it will cause two binary to have the same value
-        >>> pr.append_param('stdlib', default_value='c++11')
+        >>> pr.param_add('stdlib', default_value='c++11')
         >>> pr
         PR[openssl, compiler, os, stdlib, version]
         >>> old_assignment = {'os':'linux', 'compiler':'g++', 'version':'1.0', 'stdlib': 'c++11'}
         >>> new_assignment = {'os':'linux', 'compiler':'g++', 'version':'1.0', 'stdlib': 'static_c++'}
         >>> pr.reassign_binary(old_assignment, new_assignment)
-        >>> pr.delete_param('compiler')
+        >>> pr.param_remove('compiler')
         >>> pr
         PR[openssl, os, stdlib, version]
     """
@@ -120,8 +121,8 @@ class PackageRegistryFileBased(PackageRegistry):
 
         remote_params = self.__get_remote_params()
         if params is None and remote_params is None:
-            raise FileNotFoundError("you need to declare params if you are adding, if you are getting, this"
-                                    "means that the package registry is not properly set, you need to delete and"
+            raise FileNotFoundError("you need to declare params if you are adding. if you are getting, this "
+                                    "means that the package registry is not properly set, you need to delete and "
                                     "add again")
         elif remote_params is not None:  # ignore the passed params and use the remote one
             self.params = remote_params
@@ -228,7 +229,10 @@ class PackageRegistryFileBased(PackageRegistry):
             sub_client.mkdir(new_serialized_assignment)
             sub_client.rmdir(serialized_assignment)
 
-    def append_param(self, name: str, default_value: Optional[str] = "default") -> None:
+    def param_list(self) -> List[str]:
+        return self.params
+
+    def param_add(self, name: str, default_value: Optional[str] = "default") -> None:
         if name in self.params:
             raise ValueError("{} already in params".format(name))
 
@@ -238,7 +242,7 @@ class PackageRegistryFileBased(PackageRegistry):
 
         self.__rename_serialized_assignment(lambda x: x.update({name: default_value}))
 
-    def delete_param(self, name: str) -> None:
+    def param_remove(self, name: str) -> None:
         if name not in self.params:
             raise ValueError("{} not in params".format(name))
 
@@ -249,7 +253,7 @@ class PackageRegistryFileBased(PackageRegistry):
             new_serialized_assignment = PackageRegistryFileBased.__serialize_assignment(assignment)
             if new_serialized_assignment in new_set_of_serialized_assignment:
                 raise NameError("Cannot remove parameter {} since it will cause "
-                                 "two binary to have the same value".format(name))
+                                "two binary to have the same value".format(name))
             else:
                 new_set_of_serialized_assignment.add(new_serialized_assignment)
 
