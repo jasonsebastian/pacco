@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import os
+import random
 import re
+import string
 from typing import List, Optional, Dict
 
 from pacco.classes_interface import PackageManager, PackageRegistry, PackageBinary
@@ -139,33 +141,59 @@ class PackageRegistryFileBased(PackageRegistry):
             raise ValueError("Invalid dir_name syntax {}".format(dir_name))
         return {arg.split('=')[0]: arg.split('=')[1] for arg in dir_name.split('==')}
 
-    def list_package_binaries(self) -> List[Dict[str, str]]:
+    def __settings_dir_to_dir_name_dict(self):
         dirs = self.client.ls()
         dirs.remove(self.__generate_settings_key_dir_name(self.settings_key))
-        return [PackageRegistryFileBased.__generate_settings_value_from_dir_name(name) for name in dirs]
+        settings_dir_to_dir_name = {}
+        for dir_name in dirs:
+            subdirs = self.client.dispatch_subdir(dir_name).ls()
+            if 'bin' in subdirs:
+                subdirs.remove('bin')
+            settings_value_dir_name = subdirs[0]
+            settings_dir_to_dir_name[settings_value_dir_name] = dir_name
+        return settings_dir_to_dir_name
+
+    def list_package_binaries(self) -> List[Dict[str, str]]:
+        settings_dir_names = self.__settings_dir_to_dir_name_dict().keys()
+        return [PackageRegistryFileBased.__generate_settings_value_from_dir_name(values)
+                for values in settings_dir_names]
+
+    @staticmethod
+    def __random_string(length: int) -> str:
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
     def add_package_binary(self, settings_value: Dict[str, str]) -> None:
         if set(settings_value.keys()) != set(self.settings_key):
             raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
                                                                      sorted(self.settings_key)))
-        dir_name = PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)
-        if dir_name in self.client.ls():
+
+        settings_value_dir = PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)
+        settings_dir_name_to_dir_name = self.__settings_dir_to_dir_name_dict()
+        if settings_value_dir in settings_dir_name_to_dir_name:
             raise FileExistsError("such binary already exist")
-        self.client.mkdir(dir_name)
+
+        random_dir_name = PackageRegistryFileBased.__random_string(10)
+        if random_dir_name in settings_dir_name_to_dir_name.values():
+            random_dir_name = PackageRegistryFileBased.__random_string(10)
+
+        self.client.mkdir(random_dir_name)
+        self.client.dispatch_subdir(random_dir_name).mkdir(settings_value_dir)
         return
 
     def remove_package_binary(self, settings_value: Dict[str, str]):
-        dir_name = PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)
-        self.client.rmdir(dir_name)
+        settings_dir_name_to_dir_name = self.__settings_dir_to_dir_name_dict()
+        self.client.rmdir(settings_dir_name_to_dir_name[
+                              PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)
+                          ])
 
     def get_package_binary(self, settings_value: Dict[str, str]) -> PackageBinaryFileBased:
         dir_name = PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)
         if set(settings_value.keys()) != set(self.settings_key):
             raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
                                                                      sorted(self.settings_key)))
-        if dir_name not in self.client.ls():
+        if dir_name not in self.__settings_dir_to_dir_name_dict():
             raise FileNotFoundError("such configuration does not exist")
-        return PackageBinaryFileBased(self.client.dispatch_subdir(dir_name))
+        return PackageBinaryFileBased(self.client.dispatch_subdir(self.__settings_dir_to_dir_name_dict()[dir_name]))
 
 
 class PackageBinaryFileBased(PackageBinary):
