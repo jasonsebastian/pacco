@@ -57,15 +57,16 @@ class PackageManager:
         raise NotImplementedError()
 
 
+# TODO: do rename settings_value and settings_key also here
 class PackageRegistry:
     """
     Represent the existence of a package (e.g. openssl) in the package manager.
     This class is the interface class with the expected behavior defined below.
     """
-    def __init__(self, name: str, client: ClientAbstract, settings_key: Optional[List[str]] = None):
+    def __init__(self, name: str, client: ClientAbstract, params: Optional[List[str]] = None):
         self.name = name
         self.client = client
-        self.settings_key = settings_key
+        self.params = params
 
     def list_package_binaries(self) -> List[Dict[str, str]]:
         """

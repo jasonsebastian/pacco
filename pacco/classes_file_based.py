@@ -64,6 +64,7 @@ class PackageManagerFileBased(PackageManager):
         return "PackageManagerObject"
 
 
+#TODO: assignment seems to be more appropriate than assignments
 class PackageRegistryFileBased(PackageRegistry):
     """
     An implementation of the PackageRegistry interface
@@ -97,104 +98,107 @@ class PackageRegistryFileBased(PackageRegistry):
         >>> pr.get_package_binary({'os':'linux', 'compiler':'gcc', 'version':'1.0'})
         PackageBinaryObject
     """
+    __params_prefix = '__params'
 
-    def __init__(self, name: str, client: FileBasedClientAbstract, settings_key: Optional[List[str]] = None):
+    def __init__(self, name: str, client: FileBasedClientAbstract, params: Optional[List[str]] = None):
         if not isinstance(client, FileBasedClientAbstract):
             raise TypeError("Must be using FileBasedClient")
-        super(PackageRegistryFileBased, self).__init__(name, client, settings_key)
-        from_remote = self.__get_settings_key()
-        if settings_key is None and from_remote is None:
-            raise FileNotFoundError("you need to declare settings_key if you are adding, if you are getting, this"
+        super(PackageRegistryFileBased, self).__init__(name, client, params)
+
+        remote_params = self.__get_remote_params()
+        if params is None and remote_params is None:
+            raise FileNotFoundError("you need to declare params if you are adding, if you are getting, this"
                                     "means that the package registry is not properly set, you need to delete and"
                                     "add again")
-        elif from_remote is not None:  # ignore the passed settings_key and use the remote one
-            self.settings_key = from_remote
+        elif remote_params is not None:  # ignore the passed params and use the remote one
+            self.params = remote_params
         else:
-            self.settings_key = settings_key
-            self.client.mkdir(self.__serialize_settings_key(self.settings_key))
+            self.params = params
+            self.client.mkdir(self.__serialize_params(self.params))
 
     def __repr__(self):
-        return "PR[{}, {}]".format(self.name, ', '.join(sorted(self.settings_key)))
+        return "PR[{}, {}]".format(self.name, ', '.join(sorted(self.params)))
 
-    def __get_settings_key(self) -> Optional[List[str]]:
-        settings_key = None
+    def __get_remote_params(self) -> Optional[List[str]]:
+        params = None
         dirs = self.client.ls()
         for dir_name in dirs:
-            if '__settings_key' in dir_name:
-                settings_key = dir_name.split('==')[1:]
-        return settings_key
+            if PackageRegistryFileBased.__params_prefix in dir_name:
+                params = dir_name.split('==')[1:]
+        return params
 
     @staticmethod
-    def __serialize_settings_key(settings_key: List[str]) -> str:
-        settings_key = sorted(settings_key)
-        return '=='.join(['__settings_key'] + settings_key)
+    def __serialize_params(params: List[str]) -> str:
+        params = sorted(params)
+        return '=='.join([PackageRegistryFileBased.__params_prefix] + params)
 
     @staticmethod
-    def __serialize_settings_value(settings_value: Dict[str, str]) -> str:
-        sorted_settings_value_pair = sorted(settings_value.items(), key=lambda x: x[0])
-        zipped_assignments = ['='.join(pair) for pair in sorted_settings_value_pair]
+    def __serialize_assignments(assignments: Dict[str, str]) -> str:
+        sorted_assignments_tuple = sorted(assignments.items(), key=lambda x: x[0])
+        zipped_assignments = ['='.join(pair) for pair in sorted_assignments_tuple]
         return '=='.join(zipped_assignments)
 
     @staticmethod
-    def __unserialize_settings_value(dir_name: str) -> Dict[str, str]:
+    def __unserialize_assignments(dir_name: str) -> Dict[str, str]:
         if not re.match(r"((\w+=\w+)==)*(\w+=\w+)", dir_name):
             raise ValueError("Invalid dir_name syntax {}".format(dir_name))
         return {arg.split('=')[0]: arg.split('=')[1] for arg in dir_name.split('==')}
 
-    def __get_serialized_settings_value_and_wrapper_dict(self):
+    def __get_serialized_assignments_to_wrapper_mapping(self):
         dir_names = self.client.ls()
-        dir_names.remove(self.__serialize_settings_key(self.settings_key))
+        dir_names.remove(self.__serialize_params(self.params))
 
-        serialized_settings_values = {}
+        mapping = {}
         for dir_name in dir_names:
             sub_dirs = self.client.dispatch_subdir(dir_name).ls()
             if 'bin' in sub_dirs:
                 sub_dirs.remove('bin')
-            serialized_settings_value = sub_dirs[0]
-            serialized_settings_values[serialized_settings_value] = dir_name
-        return serialized_settings_values
+            serialized_assignments = sub_dirs[0]
+            mapping[serialized_assignments] = dir_name
+
+        return mapping
 
     def list_package_binaries(self) -> List[Dict[str, str]]:
-        return [PackageRegistryFileBased.__unserialize_settings_value(serialized_settings_value)
-                for serialized_settings_value in self.__get_serialized_settings_value_and_wrapper_dict()]
+        return [PackageRegistryFileBased.__unserialize_assignments(serialized_assignments)
+                for serialized_assignments in self.__get_serialized_assignments_to_wrapper_mapping()]
 
     @staticmethod
     def __random_string(length: int) -> str:
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
-    def add_package_binary(self, settings_value: Dict[str, str]) -> None:
-        if set(settings_value.keys()) != set(self.settings_key):
-            raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
-                                                                     sorted(self.settings_key)))
+    def add_package_binary(self, assignments: Dict[str, str]) -> None:
+        if set(assignments.keys()) != set(self.params):
+            raise KeyError("wrong settings key: {} is not {}".format(sorted(assignments.keys()),
+                                                                     sorted(self.params)))
 
-        serialized_settings_value = PackageRegistryFileBased.__serialize_settings_value(settings_value)
-        serialized_settings_value_and_wrapper = self.__get_serialized_settings_value_and_wrapper_dict()
-        if serialized_settings_value in serialized_settings_value_and_wrapper:
+        serialized_assignments = PackageRegistryFileBased.__serialize_assignments(assignments)
+        mapping = self.__get_serialized_assignments_to_wrapper_mapping()
+        if serialized_assignments in mapping:
             raise FileExistsError("such binary already exist")
 
-        random_dir_name = PackageRegistryFileBased.__random_string(10)
-        if random_dir_name in serialized_settings_value_and_wrapper.values():
-            random_dir_name = PackageRegistryFileBased.__random_string(10)
+        new_random_dir_name = PackageRegistryFileBased.__random_string(10)
+        if new_random_dir_name in mapping.values():
+            new_random_dir_name = PackageRegistryFileBased.__random_string(10)
 
-        self.client.mkdir(random_dir_name)
-        self.client.dispatch_subdir(random_dir_name).mkdir(serialized_settings_value)
+        self.client.mkdir(new_random_dir_name)
+        self.client.dispatch_subdir(new_random_dir_name).mkdir(serialized_assignments)
         return
 
-    def remove_package_binary(self, settings_value: Dict[str, str]):
-        self.client.rmdir(self.__get_serialized_settings_value_and_wrapper_dict()[
-                              PackageRegistryFileBased.__serialize_settings_value(settings_value)
+    def remove_package_binary(self, assignments: Dict[str, str]):
+        self.client.rmdir(self.__get_serialized_assignments_to_wrapper_mapping()[
+                              PackageRegistryFileBased.__serialize_assignments(assignments)
                           ])
 
-    def get_package_binary(self, settings_value: Dict[str, str]) -> PackageBinaryFileBased:
-        serialized_settings_value = PackageRegistryFileBased.__serialize_settings_value(settings_value)
-        if set(settings_value.keys()) != set(self.settings_key):
-            raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
-                                                                     sorted(self.settings_key)))
-        if serialized_settings_value not in self.__get_serialized_settings_value_and_wrapper_dict():
+    def get_package_binary(self, assignments: Dict[str, str]) -> PackageBinaryFileBased:
+        serialized_assignments = PackageRegistryFileBased.__serialize_assignments(assignments)
+        if set(assignments.keys()) != set(self.params):
+            raise KeyError("wrong settings key: {} is not {}".format(sorted(assignments.keys()),
+                                                                     sorted(self.params)))
+        if serialized_assignments not in self.__get_serialized_assignments_to_wrapper_mapping():
             raise FileNotFoundError("such configuration does not exist")
         return PackageBinaryFileBased(
             self.client.dispatch_subdir(
-                self.__get_serialized_settings_value_and_wrapper_dict()[serialized_settings_value]
+                self.__get_serialized_assignments_to_wrapper_mapping()[serialized_assignments]
             )
         )
 
