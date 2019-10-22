@@ -111,7 +111,7 @@ class PackageRegistryFileBased(PackageRegistry):
             self.settings_key = from_remote
         else:
             self.settings_key = settings_key
-            self.client.mkdir(self.__generate_settings_key_dir_name(self.settings_key))
+            self.client.mkdir(self.__serialize_settings_key(self.settings_key))
 
     def __repr__(self):
         return "PR[{}, {}]".format(self.name, ', '.join(sorted(self.settings_key)))
@@ -125,38 +125,38 @@ class PackageRegistryFileBased(PackageRegistry):
         return settings_key
 
     @staticmethod
-    def __generate_settings_key_dir_name(settings_key: List[str]) -> str:
+    def __serialize_settings_key(settings_key: List[str]) -> str:
         settings_key = sorted(settings_key)
         return '=='.join(['__settings_key'] + settings_key)
 
     @staticmethod
-    def __generate_dir_name_from_settings_value(settings_value: Dict[str, str]) -> str:
+    def __serialize_settings_value(settings_value: Dict[str, str]) -> str:
         sorted_settings_value_pair = sorted(settings_value.items(), key=lambda x: x[0])
         zipped_assignments = ['='.join(pair) for pair in sorted_settings_value_pair]
         return '=='.join(zipped_assignments)
 
     @staticmethod
-    def __generate_settings_value_from_dir_name(dir_name: str) -> Dict[str, str]:
+    def __unserialize_settings_value(dir_name: str) -> Dict[str, str]:
         if not re.match(r"((\w+=\w+)==)*(\w+=\w+)", dir_name):
             raise ValueError("Invalid dir_name syntax {}".format(dir_name))
         return {arg.split('=')[0]: arg.split('=')[1] for arg in dir_name.split('==')}
 
-    def __settings_dir_to_dir_name_dict(self):
-        dirs = self.client.ls()
-        dirs.remove(self.__generate_settings_key_dir_name(self.settings_key))
-        settings_dir_to_dir_name = {}
-        for dir_name in dirs:
-            subdirs = self.client.dispatch_subdir(dir_name).ls()
-            if 'bin' in subdirs:
-                subdirs.remove('bin')
-            settings_value_dir_name = subdirs[0]
-            settings_dir_to_dir_name[settings_value_dir_name] = dir_name
-        return settings_dir_to_dir_name
+    def __get_serialized_settings_value_and_wrapper_dict(self):
+        dir_names = self.client.ls()
+        dir_names.remove(self.__serialize_settings_key(self.settings_key))
+
+        serialized_settings_values = {}
+        for dir_name in dir_names:
+            sub_dirs = self.client.dispatch_subdir(dir_name).ls()
+            if 'bin' in sub_dirs:
+                sub_dirs.remove('bin')
+            serialized_settings_value = sub_dirs[0]
+            serialized_settings_values[serialized_settings_value] = dir_name
+        return serialized_settings_values
 
     def list_package_binaries(self) -> List[Dict[str, str]]:
-        settings_dir_names = self.__settings_dir_to_dir_name_dict().keys()
-        return [PackageRegistryFileBased.__generate_settings_value_from_dir_name(values)
-                for values in settings_dir_names]
+        return [PackageRegistryFileBased.__unserialize_settings_value(serialized_settings_value)
+                for serialized_settings_value in self.__get_serialized_settings_value_and_wrapper_dict()]
 
     @staticmethod
     def __random_string(length: int) -> str:
@@ -167,33 +167,36 @@ class PackageRegistryFileBased(PackageRegistry):
             raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
                                                                      sorted(self.settings_key)))
 
-        settings_value_dir = PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)
-        settings_dir_name_to_dir_name = self.__settings_dir_to_dir_name_dict()
-        if settings_value_dir in settings_dir_name_to_dir_name:
+        serialized_settings_value = PackageRegistryFileBased.__serialize_settings_value(settings_value)
+        serialized_settings_value_and_wrapper = self.__get_serialized_settings_value_and_wrapper_dict()
+        if serialized_settings_value in serialized_settings_value_and_wrapper:
             raise FileExistsError("such binary already exist")
 
         random_dir_name = PackageRegistryFileBased.__random_string(10)
-        if random_dir_name in settings_dir_name_to_dir_name.values():
+        if random_dir_name in serialized_settings_value_and_wrapper.values():
             random_dir_name = PackageRegistryFileBased.__random_string(10)
 
         self.client.mkdir(random_dir_name)
-        self.client.dispatch_subdir(random_dir_name).mkdir(settings_value_dir)
+        self.client.dispatch_subdir(random_dir_name).mkdir(serialized_settings_value)
         return
 
     def remove_package_binary(self, settings_value: Dict[str, str]):
-        settings_dir_name_to_dir_name = self.__settings_dir_to_dir_name_dict()
-        self.client.rmdir(settings_dir_name_to_dir_name[
-                              PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)
+        self.client.rmdir(self.__get_serialized_settings_value_and_wrapper_dict()[
+                              PackageRegistryFileBased.__serialize_settings_value(settings_value)
                           ])
 
     def get_package_binary(self, settings_value: Dict[str, str]) -> PackageBinaryFileBased:
-        dir_name = PackageRegistryFileBased.__generate_dir_name_from_settings_value(settings_value)
+        serialized_settings_value = PackageRegistryFileBased.__serialize_settings_value(settings_value)
         if set(settings_value.keys()) != set(self.settings_key):
             raise KeyError("wrong settings key: {} is not {}".format(sorted(settings_value.keys()),
                                                                      sorted(self.settings_key)))
-        if dir_name not in self.__settings_dir_to_dir_name_dict():
+        if serialized_settings_value not in self.__get_serialized_settings_value_and_wrapper_dict():
             raise FileNotFoundError("such configuration does not exist")
-        return PackageBinaryFileBased(self.client.dispatch_subdir(self.__settings_dir_to_dir_name_dict()[dir_name]))
+        return PackageBinaryFileBased(
+            self.client.dispatch_subdir(
+                self.__get_serialized_settings_value_and_wrapper_dict()[serialized_settings_value]
+            )
+        )
 
 
 class PackageBinaryFileBased(PackageBinary):
