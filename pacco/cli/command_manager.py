@@ -284,11 +284,24 @@ class Registry:
         pr = pm.get_package_registry(parsed_args.name)
         self.__out.writeln(pr.list_package_binaries())
 
-    def append_param(self, *args):
+    def param_list(self, *args):
         """
-        Add new parameter with default value to the binaries
+        List params of a registry.
         """
-        parser = argparse.ArgumentParser(prog="pacco registry append_param")
+        parser = argparse.ArgumentParser(prog="pacco registry param_list")
+        parser.add_argument("remote", help="remote name")
+        parser.add_argument("name", help="registry name")
+
+        parsed_args = parser.parse_args(args)
+        pm = self.__rm.get_remote(parsed_args.remote)
+        pr = pm.get_package_registry(parsed_args.name)
+        self.__out.writeln(pr.param_list())
+
+    def param_add(self, *args):
+        """
+        Add new parameter with default value to the binaries.
+        """
+        parser = argparse.ArgumentParser(prog="pacco registry param_add")
         parser.add_argument("remote", help="remote name")
         parser.add_argument("name", help="registry name")
         parser.add_argument("param_name", help="the new param name to be added")
@@ -297,11 +310,11 @@ class Registry:
         parsed_args = parser.parse_args(args)
         pm = self.__rm.get_remote(parsed_args.remote)
         pr = pm.get_package_registry(parsed_args.name)
-        pr.append_param(parsed_args.param_name, parsed_args.default_value)
+        pr.param_add(parsed_args.param_name, parsed_args.default_value)
 
-    def remove_param(self, *args):
+    def param_remove(self, *args):
         """
-        Remove an existing parameter from all binaries
+        Remove an existing parameter from all binaries.
         """
         parser = argparse.ArgumentParser(prog="pacco registry remove_param")
         parser.add_argument("remote", help="remote name")
@@ -311,7 +324,7 @@ class Registry:
         parsed_args = parser.parse_args(args)
         pm = self.__rm.get_remote(parsed_args.remote)
         pr = pm.get_package_registry(parsed_args.name)
-        pr.delete_param(parsed_args.param_name)
+        pr.param_remove(parsed_args.param_name)
 
 
 class Binary:

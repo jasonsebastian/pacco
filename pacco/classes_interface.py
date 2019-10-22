@@ -10,6 +10,7 @@ class PackageManager:
     Represent the existence of the manager in a remote. This class is the interface class with the
     expected behavior defined below.
     """
+
     def __init__(self, client: ClientAbstract):
         self.client = client
 
@@ -62,6 +63,7 @@ class PackageRegistry:
     Represent the existence of a package (e.g. openssl) in the package manager.
     This class is the interface class with the expected behavior defined below.
     """
+
     def __init__(self, name: str, client: ClientAbstract, params: Optional[List[str]] = None):
         self.name = name
         self.client = client
@@ -78,7 +80,7 @@ class PackageRegistry:
 
     def add_package_binary(self, assignment: Dict[str, str]) -> None:
         """
-        Add a new package binary to this registry. Note that this will only declare the existance of the binary
+        Add a new package binary to this registry. Note that this will only declare the existence of the binary
         by creating a new directory, to upload the binary must be done through the ``PackageBinaryFileBased``
         object itself.
 
@@ -113,7 +115,13 @@ class PackageRegistry:
         """
         raise NotImplementedError()
 
-    def append_param(self, name: str, default_value: Optional[str] = "default") -> None:
+    def param_list(self) -> List[str]:
+        """
+        List the declared parameters of the ```PackageRegistry```
+        """
+        raise NotImplementedError()
+
+    def param_add(self, name: str, default_value: Optional[str] = "default") -> None:
         """
         Append new parameter to each ``PackageBinary`` object and assign ``default_value`` as
         the default value to the new parameter
@@ -126,7 +134,7 @@ class PackageRegistry:
         """
         raise NotImplementedError()
 
-    def delete_param(self, name: str) -> None:
+    def param_remove(self, name: str) -> None:
         """
         Remove a parameter from each ``PackageBinary`` object
 
@@ -158,6 +166,7 @@ class PackageBinary:
         Represent the existence of a package (e.g. openssl) in the package manager
         This class is the interface class with the expected behavior defined below.
     """
+
     def __init__(self, client: ClientAbstract):
         self.client = client
 
