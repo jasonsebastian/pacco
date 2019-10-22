@@ -37,12 +37,12 @@ class RemoteManager:
         >>> rm.set_default(['local_test_2', 'local_test'])
         >>> rm.get_default()
         ['local_test_2', 'local_test']
-        >>> rm.delete_remote('local_test')
+        >>> rm.remove_remote('local_test')
         Traceback (most recent call last):
         ...
         ValueError: The remote local_test is still in default remote, remove it first
         >>> rm.set_default(['local_test_2'])
-        >>> rm.delete_remote('local_test')
+        >>> rm.remove_remote('local_test')
         >>> del rm  # auto save
         >>> other_rm = RemoteManager()
         >>> other_rm.list_remote()
@@ -140,12 +140,12 @@ class RemoteManager:
             raise NameError("The remote with name {} already exists".format(name))
         self.remotes[name] = RemoteManager.__instantiate_remote(name, configuration)
 
-    def delete_remote(self, name: str) -> None:
+    def remove_remote(self, name: str) -> None:
         """
-        Deregister a remote from this remote manager.
+        De-register a remote from this remote manager.
 
         Args:
-            name: the name of the remote to be deregistered
+            name: the name of the remote to be de-registered
         """
         if name in self.default_remotes:
             raise ValueError("The remote {} is still in default remote, remove it first".format(name))

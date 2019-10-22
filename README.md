@@ -14,3 +14,10 @@ To download a registry, run `pacco download <registry> <path> <settings_key=sett
 ```
 pip install pacco
 ```
+
+## CLI Test
+
+You need to have [bats](https://github.com/sstephenson/bats) installed in order to run tests for CLI.
+```
+bats tests/cli.bats
+```

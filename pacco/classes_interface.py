@@ -22,7 +22,7 @@ class PackageManager:
         """
         raise NotImplementedError()
 
-    def delete_package_registry(self, name: str) -> None:
+    def remove_package_registry(self, name: str) -> None:
         """
         Delete a package registry from the package manager.
 
@@ -90,7 +90,7 @@ class PackageRegistry:
         """
         raise NotImplementedError()
 
-    def delete_package_binary(self, settings_value: Dict[str, str]):
+    def remove_package_binary(self, settings_value: Dict[str, str]):
         """
         Delete the package binary folder
 
