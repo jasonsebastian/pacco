@@ -9,7 +9,7 @@ script:
   - ./bats/install.sh bats_installation
   - export PATH=$PATH:$PWD/bats_installation
   - pip install .
-  - bats tests/cli.bats
+  - bats --tap tests/cli.bats
 
 deploy:
   provider: script
