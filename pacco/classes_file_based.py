@@ -4,7 +4,7 @@ import os
 import random
 import re
 import string
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Callable
 
 from pacco.classes_interface import PackageManager, PackageRegistry, PackageBinary
 from pacco.clients import FileBasedClientAbstract
@@ -64,7 +64,6 @@ class PackageManagerFileBased(PackageManager):
         return "PackageManagerObject"
 
 
-#TODO: assignment seems to be more appropriate than assignment
 class PackageRegistryFileBased(PackageRegistry):
     """
     An implementation of the PackageRegistry interface
@@ -97,6 +96,20 @@ class PackageRegistryFileBased(PackageRegistry):
         1
         >>> pr.get_package_binary({'os':'linux', 'compiler':'gcc', 'version':'1.0'})
         PackageBinaryObject
+        >>> pr.add_package_binary({'os':'linux', 'compiler':'g++', 'version':'1.0'})
+        >>> pr.delete_param('compiler')
+        Traceback (most recent call last):
+        ...
+        ValueError: Cannot remove parameter compiler since it will cause two binary to have the same value
+        >>> pr.append_param('stdlib', default_value='c++11')
+        >>> pr
+        PR[openssl, compiler, os, stdlib, version]
+        >>> old_assignment = {'os':'linux', 'compiler':'g++', 'version':'1.0', 'stdlib': 'c++11'}
+        >>> new_assignment = {'os':'linux', 'compiler':'g++', 'version':'1.0', 'stdlib': 'static_c++'}
+        >>> pr.reassign_binary(old_assignment, new_assignment)
+        >>> pr.delete_param('compiler')
+        >>> pr
+        PR[openssl, os, stdlib, version]
     """
     __params_prefix = '__params'
 
@@ -134,6 +147,9 @@ class PackageRegistryFileBased(PackageRegistry):
 
     @staticmethod
     def __serialize_assignment(assignment: Dict[str, str]) -> str:
+        for key, value in assignment.items():
+            if len(value) == 0:
+                raise ValueError("assignment value for param {} cannot be an empty string".format(key))
         sorted_assignment_tuple = sorted(assignment.items(), key=lambda x: x[0])
         zipped_assignment = ['='.join(pair) for pair in sorted_assignment_tuple]
         return '=='.join(zipped_assignment)
@@ -201,6 +217,64 @@ class PackageRegistryFileBased(PackageRegistry):
                 self.__get_serialized_assignment_to_wrapper_mapping()[serialized_assignment]
             )
         )
+
+    def __rename_serialized_assignment(self, action: Callable[[Dict[str, str]], None]):
+        for serialized_assignment, dir_name in self.__get_serialized_assignment_to_wrapper_mapping().items():
+            assignment = PackageRegistryFileBased.__unserialize_assignment(serialized_assignment)
+            action(assignment)
+            new_serialized_assignment = PackageRegistryFileBased.__serialize_assignment(assignment)
+
+            sub_client = self.client.dispatch_subdir(dir_name)
+            sub_client.mkdir(new_serialized_assignment)
+            sub_client.rmdir(serialized_assignment)
+
+    def append_param(self, name: str, default_value: Optional[str] = "default") -> None:
+        if name in self.params:
+            raise ValueError("{} already in params".format(name))
+
+        self.client.rmdir(self.__serialize_params(self.params))
+        self.params.append(name)
+        self.client.mkdir(self.__serialize_params(self.params))
+
+        self.__rename_serialized_assignment(lambda x: x.update({name: default_value}))
+
+    def delete_param(self, name: str) -> None:
+        if name not in self.params:
+            raise ValueError("{} not in params".format(name))
+
+        new_set_of_serialized_assignment = set()
+        for serialized_assignment, dir_name in self.__get_serialized_assignment_to_wrapper_mapping().items():
+            assignment = PackageRegistryFileBased.__unserialize_assignment(serialized_assignment)
+            del assignment[name]
+            new_serialized_assignment = PackageRegistryFileBased.__serialize_assignment(assignment)
+            if new_serialized_assignment in new_set_of_serialized_assignment:
+                raise ValueError("Cannot remove parameter {} since it will cause "
+                                 "two binary to have the same value".format(name))
+            else:
+                new_set_of_serialized_assignment.add(new_serialized_assignment)
+
+        self.client.rmdir(self.__serialize_params(self.params))
+        self.params.remove(name)
+        self.client.mkdir(self.__serialize_params(self.params))
+
+        self.__rename_serialized_assignment(lambda x: x.pop(name))
+
+    def reassign_binary(self, old_assignment: Dict[str, str], new_assignment: Dict[str, str]) -> None:
+        if set(new_assignment.keys()) != set(self.params):
+            raise KeyError("wrong settings key: {} is not {}".format(sorted(new_assignment.keys()),
+                                                                     sorted(self.params)))
+
+        serialized_old_assignment = PackageRegistryFileBased.__serialize_assignment(old_assignment)
+        serialized_new_assignment = PackageRegistryFileBased.__serialize_assignment(new_assignment)
+        mapping = self.__get_serialized_assignment_to_wrapper_mapping()
+        if serialized_old_assignment not in mapping:
+            raise ValueError("there is no binary that match the assignment")
+        if serialized_new_assignment in mapping:
+            raise ValueError("there already exist binary with same assignment with the new one")
+
+        sub_client = self.client.dispatch_subdir(mapping[serialized_old_assignment])
+        sub_client.rmdir(serialized_old_assignment)
+        sub_client.mkdir(serialized_new_assignment)
 
 
 class PackageBinaryFileBased(PackageBinary):
